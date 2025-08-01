@@ -107,23 +107,53 @@ async function sendData() {
   const data = await response.json();
   console.log("APIレスポンス:", data);
 
+  document.getElementById("loading").style.display = "none";
+
   // 結果表示
   document.getElementById("resultA").textContent =
     data.commentA || data.output_text || "応答がありません";
   document.getElementById("resultB").textContent =
     data.commentB || data.output_text || "応答がありません";
 
-  document.getElementById("loading").style.display = "none";
-
-  // === 履歴保存 ===
-  saveHistory({
+  // === タグ抽出 → 履歴保存 ===
+  await extractTagsAndSave(base64Image, {
     userPrompt,
     emotion: selectedEmotion,
     commentA: data.commentA,
     commentB: data.commentB,
     timestamp: Date.now()
   });
+
   displayHistory();
+}
+
+// ===============================
+// タグ抽出 → 履歴保存
+// ===============================
+async function extractTagsAndSave(base64Image, historyEntry) {
+  try {
+    const response = await fetch("/api/extractTags", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: base64Image })
+    });
+
+    if (!response.ok) throw new Error(`タグ抽出エラー: ${response.status}`);
+    const tagData = await response.json();
+
+    console.log("タグ抽出結果:", tagData);
+
+    // タグ情報を履歴に追加
+    historyEntry.tags = tagData.tags || [];
+    historyEntry.extractedEmotions = tagData.emotions || [];
+
+    saveHistory(historyEntry);
+  } catch (err) {
+    console.error("タグ抽出失敗:", err);
+
+    // タグが取れなくても履歴だけ保存
+    saveHistory(historyEntry);
+  }
 }
 
 // ===============================
@@ -188,7 +218,8 @@ function displayHistory() {
         <strong>${date}</strong> (${item.emotion || "感情なし"})<br>
         <em>${item.userPrompt || "コメントなし"}</em><br>
         A: ${item.commentA || "なし"}<br>
-        B: ${item.commentB || "なし"}
+        B: ${item.commentB || "なし"}<br>
+        タグ: ${item.tags?.map(t => t.tag).join(", ") || "なし"}
       </div>
       <hr>`;
   }).join("");
