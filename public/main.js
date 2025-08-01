@@ -24,17 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // タグ抽出テストボタン
-  document.getElementById("extractBtn")?.addEventListener("click", async () => {
-    const imageInput = document.getElementById("imageInput");
-    if (!imageInput.files[0]) {
-      alert("画像を選択してください");
-      return;
-    }
-    const base64Image = await toBase64(imageInput.files[0]);
-    await extractTagsAndSave(base64Image);
-  });
-
   // 比較送信ボタン
   document.getElementById("compareBtn").addEventListener("click", sendData);
 
@@ -125,6 +114,16 @@ async function sendData() {
     data.commentB || data.output_text || "応答がありません";
 
   document.getElementById("loading").style.display = "none";
+
+  // === 履歴保存 ===
+  saveHistory({
+    userPrompt,
+    emotion: selectedEmotion,
+    commentA: data.commentA,
+    commentB: data.commentB,
+    timestamp: Date.now()
+  });
+  displayHistory();
 }
 
 // ===============================
@@ -163,10 +162,36 @@ function loadSavedPrompts() {
   document.getElementById("username").value = data.username || "";
 }
 
-// 履歴表示（仮）
+// ===============================
+// 履歴保存・表示
+// ===============================
+function saveHistory(entry) {
+  const history = JSON.parse(localStorage.getItem("history") || "[]");
+  history.unshift(entry); // 先頭に追加
+  if (history.length > 20) history.pop(); // 最大20件保持
+  localStorage.setItem("history", JSON.stringify(history));
+}
+
 function displayHistory() {
   const historyEl = document.getElementById("historyResult");
-  historyEl.textContent = "履歴はまだ実装されていません";
+  const history = JSON.parse(localStorage.getItem("history") || "[]");
+
+  if (!history.length) {
+    historyEl.textContent = "履歴はまだありません";
+    return;
+  }
+
+  historyEl.innerHTML = history.map(item => {
+    const date = new Date(item.timestamp).toLocaleString();
+    return `
+      <div class="history-item">
+        <strong>${date}</strong> (${item.emotion || "感情なし"})<br>
+        <em>${item.userPrompt || "コメントなし"}</em><br>
+        A: ${item.commentA || "なし"}<br>
+        B: ${item.commentB || "なし"}
+      </div>
+      <hr>`;
+  }).join("");
 }
 
 // リセット
