@@ -40,10 +40,11 @@ export default async function handler(req, res) {
         }),
       });
 
+      // デバッグ: エラー時の詳細を返す
       if (!response.ok) {
-        const text = await response.text();
-        console.error("OpenAI API error (non-JSON):", text);
-        throw new Error(`OpenAI API returned status ${response.status}`);
+        const errorText = await response.text();
+        console.error("OpenAI API error detail:", errorText);
+        return `Error ${response.status}: ${errorText}`;
       }
 
       const data = await response.json();
