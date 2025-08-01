@@ -5,7 +5,9 @@ export default async function handler(req, res) {
 
   const { promptA, promptB, userPrompt, image, temperature, maxTokens, topP, model } = req.body;
 
-  // OpenAI API呼び出し
+  // Base64からヘッダー削除（もし付与されていたら）
+  const cleanBase64 = image.replace(/^data:image\/\w+;base64,/, "");
+
   async function callOpenAI(systemPrompt, userPrompt) {
     try {
       const response = await fetch("https://api.openai.com/v1/responses", {
@@ -24,12 +26,12 @@ export default async function handler(req, res) {
               role: "user",
               content: [
                 {
-                  type: "text",  // ← 修正
-                  text: `${systemPrompt}\n\n${userPrompt}`
+                  type: "text",
+                  text: `${systemPrompt || ""}\n\n${userPrompt || ""}`
                 },
                 {
-                  type: "image_url",  // ← 修正
-                  image_url: { url: `data:image/jpeg;base64,${image}` }  // ← 修正
+                  type: "image_url",
+                  image_url: { url: `data:image/jpeg;base64,${cleanBase64}` }
                 }
               ]
             }
