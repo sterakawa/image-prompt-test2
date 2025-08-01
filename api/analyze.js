@@ -5,9 +5,7 @@ export default async function handler(req, res) {
 
   const { promptA, promptB, userPrompt, image, temperature, maxTokens, topP, model } = req.body;
 
-  // Base64からヘッダー削除（もし付与されていたら）
-  const cleanBase64 = image.replace(/^data:image\/\w+;base64,/, "");
-
+  // 共通関数：OpenAI API呼び出し
   async function callOpenAI(systemPrompt, userPrompt) {
     try {
       const response = await fetch("https://api.openai.com/v1/responses", {
@@ -31,7 +29,9 @@ export default async function handler(req, res) {
                 },
                 {
                   type: "image_url",
-                  image_url: { url: `data:image/jpeg;base64,${cleanBase64}` }
+                  image_url: {
+                    url: image  // main.js から既に "data:image/jpeg;base64,..." が渡ってくる
+                  }
                 }
               ]
             }
@@ -61,6 +61,7 @@ export default async function handler(req, res) {
   }
 
   try {
+    // A/B 両方呼び出し
     const [commentA, commentB] = await Promise.all([
       callOpenAI(promptA, userPrompt),
       callOpenAI(promptB, userPrompt)
