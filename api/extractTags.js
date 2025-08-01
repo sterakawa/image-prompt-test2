@@ -7,72 +7,75 @@ export default async function handler(req, res) {
     const { image } = req.body;
 
     if (!image) {
-      return res.status(400).json({ error: "No image provided" });
+      return res.status(400).json({ error: "Image data is required" });
     }
 
-    // OpenAI API呼び出し
+    // DataURL or Base64 の場合どちらでも処理できるように
+    const imageData = image.startsWith("data:image")
+      ? image
+      : `data:image/jpeg;base64,${image}`;
+
+    // OpenAI API 呼び出し
     const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "gpt-4.1-mini",
+        model: "gpt-4.1-mini", // タグ抽出は軽量モデルで十分
+        temperature: 0,
+        top_p: 1,
+        max_output_tokens: 200,
         input: [
           {
             role: "user",
             content: [
               {
                 type: "input_text",
-                text: `
-次の画像を解析し、2種類の情報をJSON形式で出力してください。
-
-1. 物理タグ（物や場所）: 各タグと0〜1のスコア（存在確度または重要度）
-2. 情緒タグ（雰囲気・感情）: 各感情と0〜1のスコア
-
-出力例:
-{
-  "tags":[{"tag":"海","score":0.9},{"tag":"青空","score":0.8}],
-  "emotions":[{"emotion":"楽しい","score":0.85}]
-}
-                `
+                text: `以下の画像から、主要な「タグ」と「感情」をJSONで抽出してください。
+                出力形式は必ずこの形式で：
+                {
+                  "tags": [{"tag":"タグ名","score":0.9}],
+                  "emotions": [{"emotion":"感情","score":0.8}]
+                }`
               },
               {
                 type: "input_image",
-                image_url: `data:image/jpeg;base64,${image}`
+                image_url: imageData
               }
             ]
           }
-        ],
-        max_output_tokens: 200
-      })
+        ]
+      }),
     });
 
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("OpenAI API error (extractTags):", errorText);
+      return res.status(response.status).json({ error: errorText });
+    }
+
     const data = await response.json();
-    console.log("extractTags API raw response:", data);
+    console.log("extractTags API response:", JSON.stringify(data, null, 2));
 
-    // --- フォールバック処理 ---
-    let rawText = data.output_text;
-    if (!rawText && data.output && data.output[0]?.content[0]?.text) {
-      rawText = data.output[0].content[0].text;
-    }
+    // 出力解析
+    let tags = [];
+    let emotions = [];
 
-    let result = { tags: [], emotions: [] };
     try {
-      if (rawText) {
-        result = JSON.parse(rawText);
-      } else {
-        console.warn("No valid text found in response:", data);
-      }
+      // output_text → JSONパース
+      const parsed = JSON.parse(data.output_text || "{}");
+      tags = parsed.tags || [];
+      emotions = parsed.emotions || [];
     } catch (e) {
-      console.error("JSON parse error:", e);
+      console.error("Failed to parse tags JSON:", e);
     }
 
-    res.status(200).json(result);
+    return res.status(200).json({ tags, emotions });
 
   } catch (error) {
-    console.error("extractTags API error:", error);
-    res.status(500).json({ error: "Failed to extract tags" });
+    console.error("extractTags handler error:", error);
+    return res.status(500).json({ error: error.message });
   }
 }
