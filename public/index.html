@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>画像＋プロンプト比較検証</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="main.js" defer></script>
+  <!-- CSS 読み込み -->
+  <link rel="stylesheet" href="/styles.css">
+  <!-- JS 読み込み（deferでDOMロード後に実行） -->
+  <script src="/main.js" defer></script>
 </head>
 <body>
   <h1>画像＋プロンプト比較検証</h1>
@@ -84,5 +86,22 @@
   <h2>結果</h2>
   <div id="resultA" class="result-card">結果A: 応答がありません</div>
   <div id="resultB" class="result-card">結果B: 応答がありません</div>
+
+  <!-- エラーメッセージ（リトライ用） -->
+  <div id="errorMessage" class="error-message" style="display:none;">
+    コメント生成に失敗しました。<br>
+    <button id="retryBtn">再試行</button>
+  </div>
+
+  <!-- タグ抽出テスト用ボタン -->
+  <button id="extractBtn" type="button">タグ抽出テスト</button>
+
+  <!-- タグ結果表示 -->
+  <div id="tagResult" class="result-card"></div>
+
+  <!-- 履歴表示 -->
+  <h2>履歴</h2>
+  <div id="historyResult" class="result-card"></div>
+
 </body>
 </html>

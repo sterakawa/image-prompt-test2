@@ -142,4 +142,64 @@ button:hover {
     font-size: 1.4rem;
     padding: 6px;
   }
+ /* 履歴カード */
+/* 履歴アイテムの余白をコンパクトにする */
+.history-item {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 4px 6px;       /* 内側の余白を最小限に */
+  margin-bottom: 4px;     /* アイテム間も詰める */
+  background: #fafafa;
+  font-size: 0.9rem;
+  line-height: 1.2;       /* 行間も詰める */
+}
+
+/* pタグとh4タグのデフォルト余白をリセット */
+.history-item p,
+.history-item h4 {
+  margin: 0;              /* 余白を完全にリセット */
+  padding: 1px 0;         /* 最小限の間隔を確保 */
+}
+.history-item button {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  margin-top: 5px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.history-item button:hover {
+  background: #c0392b;
+}
+/* 履歴全体の result-card スタイルをリセット */
+#historyResult.result-card {
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  background: none;
+}
+.error-message {
+  color: #b00020;
+  background: #ffecec;
+  border: 1px solid #f5c2c2;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+#errorMessage button {
+  background: #ff6666;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  margin-top: 5px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+#errorMessage button:hover {
+  background: #e05555;
 }
