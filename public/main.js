@@ -219,7 +219,7 @@ function displayHistory() {
         <em>${item.userPrompt || "コメントなし"}</em><br>
         A: ${item.commentA || "なし"}<br>
         B: ${item.commentB || "なし"}<br>
-        タグ: ${item.tags?.map(t => t.tag).join(", ") || "なし"}
+        タグ: ${item.tags?.join(", ") || "なし"}
       </div>
       <hr>`;
   }).join("");
