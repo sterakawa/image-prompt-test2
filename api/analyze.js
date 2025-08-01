@@ -4,13 +4,12 @@ export default async function handler(req, res) {
       return res.status(405).json({ error: "Method Not Allowed" });
     }
 
-    const { promptA, promptB, userPrompt, image, temperature, maxTokens, topP, model } = req.body;
+    const { promptA, userPrompt, image, temperature, maxTokens, topP, model } = req.body;
 
     if (!process.env.OPENAI_API_KEY) {
       return res.status(500).json({ error: "OpenAI API Key is not set" });
     }
 
-    // OpenAI API呼び出し
     const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
@@ -20,10 +19,14 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model,
         input: [
-          // PromptA と 画像
-          promptA,
-          userPrompt,
-          { image_url: { url: image } }  // ここは type を指定せず直接オブジェクトで渡す
+          {
+            role: "user",
+            content: [
+              { type: "text", text: promptA },
+              { type: "text", text: userPrompt },
+              { type: "image_url", image_url: { url: image } }
+            ]
+          }
         ],
         temperature,
         max_output_tokens: maxTokens,
