@@ -16,7 +16,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           model: model || "gpt-4.1-mini",
           temperature: parseFloat(temperature) || 0.7,
-          max_output_tokens: parseInt(maxTokens) || 200, // ← ここ重要
+          max_output_tokens: parseInt(maxTokens) || 200,
           top_p: parseFloat(topP) || 1.0,
           input: [
             {
@@ -29,7 +29,9 @@ export default async function handler(req, res) {
                 {
                   type: "image_url",
                   image_url: {
-                    url: image // "data:image/jpeg;base64,..." が入っている
+                    url: image.startsWith("data:image")
+                      ? image
+                      : `data:image/jpeg;base64,${image}`
                   }
                 }
               ]
