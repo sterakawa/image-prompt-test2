@@ -23,16 +23,14 @@ export default async function handler(req, res) {
               role: "user",
               content: [
                 {
-                  type: "text",
+                  type: "input_text",  // 修正：text → input_text
                   text: `${systemPrompt || ""}\n\n${userPrompt || ""}`
                 },
                 {
-                  type: "image_url",
-                  image_url: {
-                    url: image.startsWith("data:image")
-                      ? image
-                      : `data:image/jpeg;base64,${image}`
-                  }
+                  type: "input_image", // 修正：image_url → input_image
+                  image_url: image.startsWith("data:image")
+                    ? image
+                    : `data:image/jpeg;base64,${image}`
                 }
               ]
             }
@@ -40,7 +38,6 @@ export default async function handler(req, res) {
         }),
       });
 
-      // デバッグ: エラー時の詳細を返す
       if (!response.ok) {
         const errorText = await response.text();
         console.error("OpenAI API error detail:", errorText);
