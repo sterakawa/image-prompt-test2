@@ -10,7 +10,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "OpenAI API Key is not set" });
     }
 
-    // OpenAI API 呼び出し
+    // OpenAI API呼び出し
     const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
@@ -20,9 +20,10 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model,
         input: [
-          { role: "user", content: [{ type: "text", text: promptA }] },
-          { role: "user", content: [{ type: "text", text: userPrompt }] },
-          { role: "user", content: [{ type: "image_url", image_url: { url: image } }] }
+          // PromptA と 画像
+          promptA,
+          userPrompt,
+          { image_url: { url: image } }  // ここは type を指定せず直接オブジェクトで渡す
         ],
         temperature,
         max_output_tokens: maxTokens,
@@ -30,7 +31,6 @@ export default async function handler(req, res) {
       }),
     });
 
-    // エラー時レスポンス処理
     if (!response.ok) {
       const errorText = await response.text();
       return res.status(response.status).json({ error: errorText });
