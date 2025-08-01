@@ -5,7 +5,6 @@ export default async function handler(req, res) {
 
   const { promptA, promptB, userPrompt, image, temperature, maxTokens, topP, model } = req.body;
 
-  // 共通関数：OpenAI API呼び出し
   async function callOpenAI(systemPrompt, userPrompt) {
     try {
       const response = await fetch("https://api.openai.com/v1/responses", {
@@ -17,7 +16,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           model: model || "gpt-4.1-mini",
           temperature: parseFloat(temperature) || 0.7,
-          max_output_tokens: parseInt(maxTokens) || 200,
+          max_output_tokens: parseInt(maxTokens) || 200, // ← ここ重要
           top_p: parseFloat(topP) || 1.0,
           input: [
             {
@@ -30,7 +29,7 @@ export default async function handler(req, res) {
                 {
                   type: "image_url",
                   image_url: {
-                    url: image  // main.js から既に "data:image/jpeg;base64,..." が渡ってくる
+                    url: image // "data:image/jpeg;base64,..." が入っている
                   }
                 }
               ]
@@ -61,7 +60,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // A/B 両方呼び出し
     const [commentA, commentB] = await Promise.all([
       callOpenAI(promptA, userPrompt),
       callOpenAI(promptB, userPrompt)
