@@ -1,4 +1,6 @@
-/* 全体レイアウト */
+/* =====================
+   基本レイアウト
+===================== */
 body {
   font-family: sans-serif;
   margin: 20px;
@@ -11,7 +13,7 @@ h1 {
   margin-bottom: 20px;
 }
 
-/* 固定プロンプト（人格＋共通ルール） */
+/* 固定プロンプト */
 .fixed-prompts {
   display: flex;
   gap: 10px;
@@ -40,7 +42,9 @@ textarea {
   box-sizing: border-box;
 }
 
-/* 感情ボタン */
+/* =====================
+   感情ボタン
+===================== */
 .emotions {
   display: flex;
   flex-wrap: wrap;
@@ -68,7 +72,9 @@ textarea {
   border-color: #0056b3;
 }
 
-/* 入力フィールド */
+/* =====================
+   入力フィールド
+===================== */
 input[type="text"],
 input[type="number"],
 select {
@@ -81,7 +87,9 @@ select {
   box-sizing: border-box;
 }
 
-/* ボタン */
+/* =====================
+   ボタン
+===================== */
 button {
   padding: 8px 16px;
   font-size: 1rem;
@@ -98,14 +106,18 @@ button:hover {
   background: #0056b3;
 }
 
-/* ローディング表示 */
+/* =====================
+   ローディング表示
+===================== */
 .loading {
   font-size: 0.9rem;
   color: #555;
   margin-top: 10px;
 }
 
-/* 結果カード */
+/* =====================
+   結果カード
+===================== */
 .result-card {
   background: white;
   padding: 12px;
@@ -116,7 +128,100 @@ button:hover {
   white-space: pre-wrap;
 }
 
-/* レスポンシブ対応（スマホ） */
+/* =====================
+   履歴カード
+===================== */
+.history-item {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 4px 6px;
+  margin-bottom: 4px;
+  background: #fafafa;
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+.history-item p,
+.history-item h4 {
+  margin: 0;
+  padding: 1px 0;
+}
+
+.history-item button {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  margin-top: 5px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.history-item button:hover {
+  background: #c0392b;
+}
+
+/* 履歴全体の result-card スタイルリセット */
+#historyResult.result-card {
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  background: none;
+}
+
+/* =====================
+   エラーメッセージ
+===================== */
+.error-message {
+  color: #b00020;
+  background: #ffecec;
+  border: 1px solid #f5c2c2;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+#errorMessage button {
+  background: #ff6666;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  margin-top: 5px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+#errorMessage button:hover {
+  background: #e05555;
+}
+
+/* =====================
+   ユーザーテスト画面リンク
+===================== */
+.link-to-user {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.user-link-btn {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #007bff;
+  color: #fff;
+  font-size: 14px;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.user-link-btn:hover {
+  background: #0056b3;
+}
+
+/* =====================
+   レスポンシブ対応
+===================== */
 @media (max-width: 768px) {
   .fixed-prompts {
     flex-direction: column;
@@ -142,83 +247,4 @@ button:hover {
     font-size: 1.4rem;
     padding: 6px;
   }
- /* 履歴カード */
-/* 履歴アイテムの余白をコンパクトにする */
-.history-item {
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 4px 6px;       /* 内側の余白を最小限に */
-  margin-bottom: 4px;     /* アイテム間も詰める */
-  background: #fafafa;
-  font-size: 0.9rem;
-  line-height: 1.2;       /* 行間も詰める */
-}
-
-/* pタグとh4タグのデフォルト余白をリセット */
-.history-item p,
-.history-item h4 {
-  margin: 0;              /* 余白を完全にリセット */
-  padding: 1px 0;         /* 最小限の間隔を確保 */
-}
-.history-item button {
-  background: #e74c3c;
-  color: #fff;
-  border: none;
-  padding: 5px 10px;
-  margin-top: 5px;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-.history-item button:hover {
-  background: #c0392b;
-}
-/* 履歴全体の result-card スタイルをリセット */
-#historyResult.result-card {
-  padding: 0;
-  margin: 0;
-  box-shadow: none;
-  background: none;
-}
-.error-message {
-  color: #b00020;
-  background: #ffecec;
-  border: 1px solid #f5c2c2;
-  padding: 10px;
-  margin-top: 10px;
-  border-radius: 6px;
-  font-size: 0.9rem;
-}
-
-#errorMessage button {
-  background: #ff6666;
-  color: #fff;
-  border: none;
-  padding: 5px 10px;
-  margin-top: 5px;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-#errorMessage button:hover {
-  background: #e05555;
-}
-.link-to-user {
-  margin-top: 10px;
-  text-align: center;
-}
-
-.user-link-btn {
-  display: inline-block;
-  padding: 8px 16px;
-  background: #4caf50;
-  color: #fff;
-  font-size: 14px;
-  text-decoration: none;
-  border-radius: 6px;
-  transition: background 0.2s;
-}
-
-.user-link-btn:hover {
-  background: #45a049;
 }
