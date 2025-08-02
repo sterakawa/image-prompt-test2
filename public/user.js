@@ -95,11 +95,11 @@ async function sendData() {
   // 送信用にリサイズ＆Base64化
   const base64Image = await resizeImage(imageInput.files[0], 512);
 
-  // APIリクエストデータ（常に両方送る）
+  // APIリクエストデータ（常に両方送る）※ユーザー名追加
   const requestData = {
     promptA: combinedPromptA,
     promptB: combinedPromptB,
-    userPrompt: `${emotionText}${userComment}`,
+    userPrompt: `名前: ${username}\n${emotionText}${userComment}`,  // ←ユーザー名反映
     image: base64Image,
     temperature: 0.7,
     maxTokens: 200,
@@ -122,9 +122,6 @@ async function sendData() {
 
   bubbleA.classList.add("loading");
   bubbleB.classList.add("loading");
-
-  bubbleA.querySelector(".username").textContent = username;
-  bubbleB.querySelector(".username").textContent = username;
 
   bubbleA.querySelector(".comment").textContent = "";
   bubbleB.querySelector(".comment").textContent = "";
