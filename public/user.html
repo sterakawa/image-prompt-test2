@@ -17,7 +17,13 @@
       <div id="previewArea" class="preview">写真をアップロード</div>
     </label>
 
-    <!-- ユーザー名・コメント -->
+    <!-- 生成コメント（写真直下に配置） -->
+    <div id="resultBubble" class="bubble bubble-a">
+      <span class="username"></span>
+      <p class="comment">ここに結果が表示されます</p>
+    </div>
+
+    <!-- 入力フォーム -->
     <input type="text" id="username" placeholder="名前（任意）">
     <textarea id="userComment" rows="2" placeholder="コメントを書く（任意）"></textarea>
 
@@ -35,14 +41,6 @@
 
     <!-- 送信ボタン -->
     <button id="sendBtn" class="send-btn">送信</button>
-
-    <!-- 結果表示 -->
-    <div id="resultArea" class="result-area">
-      <div id="resultBubble" class="bubble bubble-a">
-        <span class="username"></span>
-        <p class="comment">ここに結果が表示されます</p>
-      </div>
-    </div>
 
   </main>
 
