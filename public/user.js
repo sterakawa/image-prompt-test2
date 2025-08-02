@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("プロンプト読み込み失敗:", err);
   }
 
-  // 感情ボタンイベント
+  // 感情ボタンのイベント
   document.querySelectorAll(".emotion-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".emotion-btn").forEach(b => b.classList.remove("selected"));
@@ -48,10 +48,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 送信ボタン
   document.getElementById("sendBtn").addEventListener("click", sendData);
-
-  // 初期バブル非表示
-  document.getElementById("resultBubbleA").style.display = "none";
-  document.getElementById("resultBubbleB").style.display = "none";
 });
 
 // ===============================
@@ -62,16 +58,9 @@ function switchMode(mode) {
   document.getElementById("switchA").classList.toggle("active", mode === "A");
   document.getElementById("switchB").classList.toggle("active", mode === "B");
 
-  // A/Bバブル切替（送信済みコメントの切替表示も反映）
-  document.getElementById("resultBubbleA").style.display =
-    mode === "A" && document.querySelector("#resultBubbleA .comment").textContent
-      ? "inline-block"
-      : "none";
-
-  document.getElementById("resultBubbleB").style.display =
-    mode === "B" && document.querySelector("#resultBubbleB .comment").textContent
-      ? "inline-block"
-      : "none";
+  // バブル切替表示
+  document.getElementById("resultBubbleA").style.display = (mode === "A") ? "inline-block" : "none";
+  document.getElementById("resultBubbleB").style.display = (mode === "B") ? "inline-block" : "none";
 }
 
 // ===============================
@@ -94,16 +83,16 @@ async function sendData() {
   }
 
   // --- モードごとにプロンプト決定（+固定ルール） ---
-  const combinedPromptA = `${personaPromptA}\n\n${rulePrompt}`;
-  const combinedPromptB = `${personaPromptB}\n\n${rulePrompt}`;
+  const combinedPromptA = `${personaPromptA}\n${rulePrompt}`;
+  const combinedPromptB = `${personaPromptB}\n${rulePrompt}`;
 
   // 送信用にリサイズ＆Base64化
   const base64Image = await resizeImage(imageInput.files[0], 512);
 
   // APIリクエストデータ
   const requestData = {
-    promptA: currentMode === "A" ? combinedPromptA : "",
-    promptB: currentMode === "B" ? combinedPromptB : "",
+    promptA: combinedPromptA,
+    promptB: combinedPromptB,
     userPrompt: userComment,
     image: base64Image,
     temperature: 0.7,
@@ -111,6 +100,8 @@ async function sendData() {
     topP: 0.6,
     model: "gpt-4.1-mini"
   };
+
+  console.log("送信データ:", requestData);
 
   try {
     const response = await fetch("/api/analyze", {
@@ -126,21 +117,18 @@ async function sendData() {
 
     const data = await response.json();
 
-    // 対応バブル選択
-    const bubbleId = currentMode === "A" ? "resultBubbleA" : "resultBubbleB";
-    const targetBubble = document.getElementById(bubbleId);
-
-    // バブル更新
-    targetBubble.querySelector(".username").textContent = username;
-    targetBubble.querySelector(".comment").textContent =
-      data.commentA || data.commentB || "応答がありません";
-
-    // 表示
-    targetBubble.style.display = "inline-block";
-
-    // 他方のバブルは非表示
-    const otherBubbleId = currentMode === "A" ? "resultBubbleB" : "resultBubbleA";
-    document.getElementById(otherBubbleId).style.display = "none";
+    // モード別にコメント更新
+    if (currentMode === "A") {
+      document.querySelector("#resultBubbleA .username").textContent = username;
+      document.querySelector("#resultBubbleA .comment").textContent = data.commentA || "応答がありません";
+      document.getElementById("resultBubbleA").style.display = "inline-block";
+      document.getElementById("resultBubbleB").style.display = "none";
+    } else {
+      document.querySelector("#resultBubbleB .username").textContent = username;
+      document.querySelector("#resultBubbleB .comment").textContent = data.commentB || "応答がありません";
+      document.getElementById("resultBubbleB").style.display = "inline-block";
+      document.getElementById("resultBubbleA").style.display = "none";
+    }
 
   } catch (error) {
     console.error("送信エラー:", error);
@@ -175,29 +163,12 @@ function resizeImage(file, maxSize = 512) {
     };
     img.onload = () => {
       const canvas = document.createElement("canvas");
-      let width = img.width;
-      let height = img.height;
-
-      // 長辺基準で縮小
-      if (width > height) {
-        if (width > maxSize) {
-          height *= maxSize / width;
-          width = maxSize;
-        }
-      } else {
-        if (height > maxSize) {
-          width *= maxSize / height;
-          height = maxSize;
-        }
-      }
-
-      canvas.width = width;
-      canvas.height = height;
-
+      const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
       const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, width, height);
-
-      resolve(canvas.toDataURL("image/jpeg", 0.8)); // JPEG圧縮80%
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", 0.8)); // JPEG圧縮率80%
     };
     reader.readAsDataURL(file);
   });
