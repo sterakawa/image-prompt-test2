@@ -61,7 +61,7 @@ function switchMode(mode) {
   document.getElementById("switchA").classList.toggle("active", mode === "A");
   document.getElementById("switchB").classList.toggle("active", mode === "B");
 
-  // バブル切替表示
+  // 表示を切り替える（データは常に両方保持済み）
   document.getElementById("resultBubbleA").style.display = (mode === "A") ? "inline-block" : "none";
   document.getElementById("resultBubbleB").style.display = (mode === "B") ? "inline-block" : "none";
 }
@@ -85,17 +85,17 @@ async function sendData() {
     return;
   }
 
-  // --- モードごとにプロンプト決定（+固定ルール） ---
+  // --- A/B両方のプロンプト（+固定ルール） ---
   const combinedPromptA = `${personaPromptA}\n${rulePrompt}`;
   const combinedPromptB = `${personaPromptB}\n${rulePrompt}`;
 
   // 送信用にリサイズ＆Base64化
   const base64Image = await resizeImage(imageInput.files[0], 512);
 
-  // APIリクエストデータ
+  // APIリクエストデータ（常に両方送る）
   const requestData = {
-    promptA: currentMode === "A" ? combinedPromptA : "",
-    promptB: currentMode === "B" ? combinedPromptB : "",
+    promptA: combinedPromptA,
+    promptB: combinedPromptB,
     userPrompt: userComment,
     image: base64Image,
     temperature: 0.7,
@@ -121,18 +121,15 @@ async function sendData() {
     const data = await response.json();
     console.log("受信データ:", data);
 
-    // A/Bモードごとにバブルを切り替えて表示
-    if (currentMode === "A") {
-      document.querySelector("#resultBubbleA .username").textContent = username;
-      document.querySelector("#resultBubbleA .comment").textContent = data.commentA || "応答がありません";
-      document.getElementById("resultBubbleA").classList.remove("hidden");
-      document.getElementById("resultBubbleB").classList.add("hidden");
-    } else {
-      document.querySelector("#resultBubbleB .username").textContent = username;
-      document.querySelector("#resultBubbleB .comment").textContent = data.commentB || "応答がありません";
-      document.getElementById("resultBubbleB").classList.remove("hidden");
-      document.getElementById("resultBubbleA").classList.add("hidden");
-    }
+    // 両方のバブルを更新
+    document.querySelector("#resultBubbleA .username").textContent = username;
+    document.querySelector("#resultBubbleA .comment").textContent = data.commentA || "応答がありません";
+
+    document.querySelector("#resultBubbleB .username").textContent = username;
+    document.querySelector("#resultBubbleB .comment").textContent = data.commentB || "応答がありません";
+
+    // 現在モードに合わせて表示切り替え
+    switchMode(currentMode);
 
   } catch (error) {
     console.error("送信エラー:", error);
