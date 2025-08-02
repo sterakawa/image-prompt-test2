@@ -39,11 +39,6 @@ body {
 /* =====================
    生成コメント（写真直下）
 ===================== */
-.result-area {
-  margin-top: 12px;
-  margin-bottom: 16px;
-}
-
 .bubble {
   display: inline-block;
   max-width: 90%;
@@ -53,6 +48,7 @@ body {
   font-size: 14px;
   line-height: 1.5;
   word-wrap: break-word;
+  margin-bottom: 16px;
 }
 
 /* 吹き出しA/Bの色分け */
@@ -78,17 +74,17 @@ body {
 }
 
 /* =====================
-   感情ボタン（横スクロール）
+   感情ボタン（横スクロール1列）
 ===================== */
-.emotions-wrapper {
+.emotions-scroll {
   margin-bottom: 12px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefoxでスクロールバー非表示 */
+  scrollbar-width: none; /* Firefox */
 }
 
-.emotions-wrapper::-webkit-scrollbar {
-  display: none; /* Chrome/Safariでスクロールバー非表示 */
+.emotions-scroll::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
 .emotions {
@@ -131,13 +127,18 @@ textarea {
 }
 
 /* =====================
-   送信ボタン
+   送信・共有ボタン横並び
 ===================== */
-.send-btn {
-  width: 100%;
+.button-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.send-btn,
+.share-btn {
+  flex: 1;
   padding: 12px;
-  background: #2196f3;
-  color: #fff;
   font-size: 16px;
   border: none;
   border-radius: 8px;
@@ -145,8 +146,22 @@ textarea {
   transition: background 0.2s;
 }
 
+.send-btn {
+  background: #2196f3;
+  color: #fff;
+}
+
 .send-btn:hover {
   background: #1976d2;
+}
+
+.share-btn {
+  background: #4caf50;
+  color: #fff;
+}
+
+.share-btn:hover {
+  background: #388e3c;
 }
 
 /* =====================
