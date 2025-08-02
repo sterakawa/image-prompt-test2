@@ -15,6 +15,15 @@ body {
 }
 
 /* =====================
+   キャプチャ範囲（写真＋コメント）
+===================== */
+#captureArea {
+  background-color: #ffffff;
+  padding: 16px;        /* 均等な余白 */
+  border-radius: 14px;  /* 角丸 */
+}
+
+/* =====================
    写真アップロード
 ===================== */
 .upload-area {
@@ -31,13 +40,15 @@ body {
 
 .preview img {
   max-width: 100%;
+  border: 8px solid #fff;   /* 額縁 */
   border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   display: block;
   margin: 0 auto;
 }
 
 /* =====================
-   生成コメント（写真直下）
+   コメントバブル
 ===================== */
 .bubble {
   display: inline-block;
@@ -48,7 +59,7 @@ body {
   font-size: 14px;
   line-height: 1.5;
   word-wrap: break-word;
-  margin-bottom: 16px;
+  margin-top: 12px;
 }
 
 /* 吹き出しA/Bの色分け */
@@ -68,9 +79,24 @@ body {
   margin-bottom: 4px;
 }
 
-/* 初期は非表示 */
+/* 初期非表示 */
 .hidden {
   display: none;
+}
+
+/* =====================
+   ローディング演出
+===================== */
+.bubble.loading .comment::after {
+  content: "生成中…";
+  font-style: italic;
+  color: #888;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 /* =====================
@@ -80,11 +106,11 @@ body {
   margin-bottom: 12px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
 }
 
 .emotions-scroll::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  display: none;
 }
 
 .emotions {
@@ -121,7 +147,7 @@ textarea {
   margin-bottom: 12px;
   border: 1px solid #ccc;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 16px; /* ←ここ16pxにして拡大防止 */
   background: #fff;
   box-sizing: border-box;
 }
@@ -132,7 +158,6 @@ textarea {
 .button-row {
   display: flex;
   gap: 8px;
-  margin-top: 8px;
 }
 
 .send-btn,
@@ -190,29 +215,4 @@ textarea {
 .toggle-btn.active {
   background: #2196f3;
   color: #fff;
-}
-/* =====================
-   額縁・キャプチャ範囲
-===================== */
-
-/* キャプチャ範囲全体に白背景と均等余白 */
-#captureArea {
-  background-color: #ffffff;
-  padding: 16px;        /* 写真とコメント周りの余白 */
-  border-radius: 14px;  /* 角丸 */
-}
-
-/* プレビュー画像に額縁と影 */
-.preview img {
-  max-width: 100%;
-  border-radius: 12px;
-  display: block;
-  margin: 0 auto;
-  border: 8px solid #fff;   /* 控えめな額縁 */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-/* コメントバブルと画像の間に余白 */
-.bubble {
-  margin-top: 12px;
 }
