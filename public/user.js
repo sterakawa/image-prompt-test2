@@ -6,6 +6,8 @@ let currentMode = "A";      // A/Bモード
 let personaPromptA = "";    // personaA.txt
 let personaPromptB = "";    // personaB.txt
 let rulePrompt = "";        // rule.txt
+let lastCommentA = "";      // 最新Aコメント
+let lastCommentB = "";      // 最新Bコメント
 
 // ===============================
 // ページロード時処理
@@ -58,8 +60,14 @@ function switchMode(mode) {
   document.getElementById("switchA").classList.toggle("active", mode === "A");
   document.getElementById("switchB").classList.toggle("active", mode === "B");
 
-  const bubble = document.getElementById("resultBubble");
-  bubble.className = `bubble bubble-${mode.toLowerCase()}`;
+  // 表示切り替え
+  if (mode === "A") {
+    document.getElementById("resultBubbleA").classList.remove("hidden");
+    document.getElementById("resultBubbleB").classList.add("hidden");
+  } else {
+    document.getElementById("resultBubbleB").classList.remove("hidden");
+    document.getElementById("resultBubbleA").classList.add("hidden");
+  }
 }
 
 // ===============================
@@ -90,8 +98,8 @@ async function sendData() {
 
   // APIリクエストデータ
   const requestData = {
-    promptA: currentMode === "A" ? combinedPromptA : "",
-    promptB: currentMode === "B" ? combinedPromptB : "",
+    promptA: combinedPromptA,
+    promptB: combinedPromptB,
     userPrompt: userComment,
     image: base64Image,
     temperature: 0.7,
@@ -109,13 +117,25 @@ async function sendData() {
 
     const data = await response.json();
 
-    // 結果表示
-    document.querySelector("#resultBubble .username").textContent = username;
-    document.querySelector("#resultBubble .comment").textContent =
-      data.commentA || data.commentB || "応答がありません";
+    // 最新コメント保存
+    lastCommentA = data.commentA || "応答がありません";
+    lastCommentB = data.commentB || "応答がありません";
 
-    // 初回は非表示だったバブルを表示
-    document.getElementById("resultBubble").style.display = "inline-block";
+    // それぞれ更新
+    document.querySelector("#resultBubbleA .username").textContent = username;
+    document.querySelector("#resultBubbleA .comment").textContent = lastCommentA;
+
+    document.querySelector("#resultBubbleB .username").textContent = username;
+    document.querySelector("#resultBubbleB .comment").textContent = lastCommentB;
+
+    // 現在モードに応じて表示
+    if (currentMode === "A") {
+      document.getElementById("resultBubbleA").classList.remove("hidden");
+      document.getElementById("resultBubbleB").classList.add("hidden");
+    } else {
+      document.getElementById("resultBubbleB").classList.remove("hidden");
+      document.getElementById("resultBubbleA").classList.add("hidden");
+    }
 
   } catch (error) {
     console.error("送信エラー:", error);
