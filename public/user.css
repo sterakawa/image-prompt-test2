@@ -202,3 +202,21 @@ textarea {
   border: 6px solid #fff;       /* 額縁 */
   box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* 影 */
 }
+/* キャプチャ範囲全体に白背景と余白 */
+#captureArea {
+  background-color: #ffffff;
+  padding: 16px;         /* 写真とコメント周りの余白 */
+  border-radius: 14px;
+}
+
+/* プレビュー画像に額縁と影 */
+.preview img {
+  border: 10px solid #fff;   /* 額縁 */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* バブルの上下にも少し余白追加 */
+.bubble {
+  margin-top: 12px;
+}
