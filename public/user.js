@@ -91,8 +91,8 @@ async function sendData() {
 
   // APIリクエストデータ
   const requestData = {
-    promptA: combinedPromptA,
-    promptB: combinedPromptB,
+    promptA: currentMode === "A" ? combinedPromptA : "",
+    promptB: currentMode === "B" ? combinedPromptB : "",
     userPrompt: userComment,
     image: base64Image,
     temperature: 0.7,
@@ -116,18 +116,19 @@ async function sendData() {
     }
 
     const data = await response.json();
+    console.log("受信データ:", data);
 
-    // モード別にコメント更新
+    // A/Bモードごとにバブルを切り替えて表示
     if (currentMode === "A") {
       document.querySelector("#resultBubbleA .username").textContent = username;
       document.querySelector("#resultBubbleA .comment").textContent = data.commentA || "応答がありません";
-      document.getElementById("resultBubbleA").style.display = "inline-block";
-      document.getElementById("resultBubbleB").style.display = "none";
+      document.getElementById("resultBubbleA").classList.remove("hidden");
+      document.getElementById("resultBubbleB").classList.add("hidden");
     } else {
       document.querySelector("#resultBubbleB .username").textContent = username;
       document.querySelector("#resultBubbleB .comment").textContent = data.commentB || "応答がありません";
-      document.getElementById("resultBubbleB").style.display = "inline-block";
-      document.getElementById("resultBubbleA").style.display = "none";
+      document.getElementById("resultBubbleB").classList.remove("hidden");
+      document.getElementById("resultBubbleA").classList.add("hidden");
     }
 
   } catch (error) {
