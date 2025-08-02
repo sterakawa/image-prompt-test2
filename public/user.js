@@ -92,18 +92,21 @@ async function sendData() {
   // 送信用にリサイズ＆Base64化
   const base64Image = await resizeImage(imageInput.files[0], 512);
 
-  // APIリクエストデータ（常に両方送る）
-  const requestData = {
-    promptA: combinedPromptA,
-    promptB: combinedPromptB,
-    userPrompt: userComment,
-    image: base64Image,
-    temperature: 0.7,
-    maxTokens: 200,
-    topP: 0.6,
-    model: "gpt-4.1-mini"
-  };
+ // 感情をコメントに追加（未選択なら空）
+const emotionText = selectedEmotion ? `感情: ${selectedEmotion}\n` : "";
 
+// APIリクエストデータ（常に両方送る）
+const requestData = {
+  promptA: combinedPromptA,
+  promptB: combinedPromptB,
+  userPrompt: `${emotionText}${userComment}`,  // ←ここで感情を反映
+  image: base64Image,
+  temperature: 0.7,
+  maxTokens: 200,
+  topP: 0.6,
+  model: "gpt-4.1-mini"
+};
+  
   console.log("送信データ:", requestData);
 
   try {
