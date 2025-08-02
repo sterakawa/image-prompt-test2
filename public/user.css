@@ -71,15 +71,50 @@ body {
   color: #555;
   margin-bottom: 4px;
 }
+
 /* 初期は非表示 */
-#resultBubble {
+.hidden {
   display: none;
 }
 
-/* 表示状態 */
-#resultBubble.show {
-  display: inline-block;
+/* =====================
+   感情ボタン（横スクロール）
+===================== */
+.emotions-wrapper {
+  margin-bottom: 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefoxでスクロールバー非表示 */
 }
+
+.emotions-wrapper::-webkit-scrollbar {
+  display: none; /* Chrome/Safariでスクロールバー非表示 */
+}
+
+.emotions {
+  display: flex;
+  gap: 8px;
+  padding: 4px 0;
+  white-space: nowrap;
+}
+
+.emotion-btn {
+  font-size: 20px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.2s;
+  flex: 0 0 auto;
+}
+
+.emotion-btn.selected {
+  background: #e0f2f1;
+  transform: scale(1.1);
+}
+
 /* =====================
    入力フィールド
 ===================== */
@@ -93,31 +128,6 @@ textarea {
   font-size: 14px;
   background: #fff;
   box-sizing: border-box;
-}
-
-/* =====================
-   感情ボタン
-===================== */
-.emotions {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.emotion-btn {
-  font-size: 22px;
-  padding: 10px;
-  border: none;
-  background: #fff;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.emotion-btn.selected {
-  background: #e0f2f1;
-  transform: scale(1.1);
 }
 
 /* =====================
