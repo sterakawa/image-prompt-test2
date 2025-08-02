@@ -48,6 +48,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 送信ボタン
   document.getElementById("sendBtn").addEventListener("click", sendData);
+
+  // 共有ボタン
+  document.getElementById("shareBtn").addEventListener("click", shareCapture);
 });
 
 // ===============================
@@ -58,14 +61,9 @@ function switchMode(mode) {
   document.getElementById("switchA").classList.toggle("active", mode === "A");
   document.getElementById("switchB").classList.toggle("active", mode === "B");
 
-  // コメントが既に生成されていれば、対応するバブルを表示
-  if (mode === "A") {
-    document.getElementById("resultBubbleA").classList.remove("hidden");
-    document.getElementById("resultBubbleB").classList.add("hidden");
-  } else {
-    document.getElementById("resultBubbleB").classList.remove("hidden");
-    document.getElementById("resultBubbleA").classList.add("hidden");
-  }
+  // バブル切替表示
+  document.getElementById("resultBubbleA").style.display = (mode === "A") ? "inline-block" : "none";
+  document.getElementById("resultBubbleB").style.display = (mode === "B") ? "inline-block" : "none";
 }
 
 // ===============================
@@ -87,7 +85,7 @@ async function sendData() {
     return;
   }
 
-  // --- A/B両方のプロンプト（+固定ルール） ---
+  // --- モードごとにプロンプト決定（+固定ルール） ---
   const combinedPromptA = `${personaPromptA}\n${rulePrompt}`;
   const combinedPromptB = `${personaPromptB}\n${rulePrompt}`;
 
@@ -96,8 +94,8 @@ async function sendData() {
 
   // APIリクエストデータ
   const requestData = {
-    promptA: combinedPromptA,
-    promptB: combinedPromptB,
+    promptA: currentMode === "A" ? combinedPromptA : "",
+    promptB: currentMode === "B" ? combinedPromptB : "",
     userPrompt: userComment,
     image: base64Image,
     temperature: 0.7,
@@ -123,16 +121,18 @@ async function sendData() {
     const data = await response.json();
     console.log("受信データ:", data);
 
-    // Aバブル更新
-    document.querySelector("#resultBubbleA .username").textContent = username;
-    document.querySelector("#resultBubbleA .comment").textContent = data.commentA || "応答がありません";
-
-    // Bバブル更新
-    document.querySelector("#resultBubbleB .username").textContent = username;
-    document.querySelector("#resultBubbleB .comment").textContent = data.commentB || "応答がありません";
-
-    // 現在モードに合わせて表示
-    switchMode(currentMode);
+    // A/Bモードごとにバブルを切り替えて表示
+    if (currentMode === "A") {
+      document.querySelector("#resultBubbleA .username").textContent = username;
+      document.querySelector("#resultBubbleA .comment").textContent = data.commentA || "応答がありません";
+      document.getElementById("resultBubbleA").classList.remove("hidden");
+      document.getElementById("resultBubbleB").classList.add("hidden");
+    } else {
+      document.querySelector("#resultBubbleB .username").textContent = username;
+      document.querySelector("#resultBubbleB .comment").textContent = data.commentB || "応答がありません";
+      document.getElementById("resultBubbleB").classList.remove("hidden");
+      document.getElementById("resultBubbleA").classList.add("hidden");
+    }
 
   } catch (error) {
     console.error("送信エラー:", error);
@@ -176,4 +176,46 @@ function resizeImage(file, maxSize = 512) {
     };
     reader.readAsDataURL(file);
   });
+}
+
+// ===============================
+// 共有（キャプチャ）機能
+// ===============================
+async function shareCapture() {
+  try {
+    const target = document.getElementById("captureArea");
+
+    // html2canvas読み込み（CDN前提）
+    if (typeof html2canvas === "undefined") {
+      alert("html2canvas が読み込まれていません");
+      return;
+    }
+
+    const canvas = await html2canvas(target, {
+      backgroundColor: "#ffffff", // 背景白
+      scale: 2 // 高解像度化
+    });
+
+    const dataUrl = canvas.toDataURL("image/png");
+    const blob = await (await fetch(dataUrl)).blob();
+    const file = new File([blob], "share.png", { type: "image/png" });
+
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: "フォトコメント",
+        text: "写真とコメントを共有します"
+      });
+    } else {
+      // 未対応ブラウザ：画像ダウンロード
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = "share.png";
+      link.click();
+    }
+
+  } catch (error) {
+    console.error("共有エラー:", error);
+    alert("共有に失敗しました");
+  }
 }
