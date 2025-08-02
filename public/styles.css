@@ -203,3 +203,22 @@ button:hover {
 #errorMessage button:hover {
   background: #e05555;
 }
+.link-to-user {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.user-link-btn {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #4caf50;
+  color: #fff;
+  font-size: 14px;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.user-link-btn:hover {
+  background: #45a049;
+}
