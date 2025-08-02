@@ -92,4 +92,4 @@ function toBase64(file) {
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
-}vaScript Document
+}
