@@ -5,6 +5,7 @@ let selectedEmotion = "";   // 感情ボタン選択
 let currentMode = "A";      // A/Bモード
 let personaPromptA = "";    // 人格Aプロンプト
 let personaPromptB = "";    // 人格Bプロンプト
+let rulePrompt = "";        // 固定プロンプト
 let commentA = "";          // Aコメント
 let commentB = "";          // Bコメント
 
@@ -14,15 +15,8 @@ let commentB = "";          // Bコメント
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("user.js 読み込みテスト");
 
-  // 管理画面(localStorage)優先 → 無ければpublicテキスト
-  const savedPrompts = JSON.parse(localStorage.getItem("prompts"));
-  if (savedPrompts && (savedPrompts.personaPromptA || savedPrompts.personaPromptB)) {
-    personaPromptA = savedPrompts.personaPromptA || "";
-    personaPromptB = savedPrompts.personaPromptB || "";
-    console.log("localStorageからロード:", personaPromptA, personaPromptB);
-  } else {
-    await loadPromptsFromPublic();
-  }
+  // localStorage or public からプロンプト読み込み
+  await loadPrompts();
 
   // 感情ボタンイベント
   document.querySelectorAll(".emotion-btn").forEach(btn => {
@@ -45,19 +39,31 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // ===============================
-// publicフォルダからプロンプト読み込み
+// プロンプト読み込み
 // ===============================
-async function loadPromptsFromPublic() {
-  try {
-    const [aRes, bRes] = await Promise.all([
-      fetch("/prompts/personaA.txt"),
-      fetch("/prompts/personaB.txt")
-    ]);
-    personaPromptA = aRes.ok ? await aRes.text() : "";
-    personaPromptB = bRes.ok ? await bRes.text() : "";
-    console.log("publicからロード:", personaPromptA, personaPromptB);
-  } catch (error) {
-    console.error("publicプロンプト読み込み失敗:", error);
+async function loadPrompts() {
+  const savedPrompts = JSON.parse(localStorage.getItem("prompts"));
+
+  if (savedPrompts && (savedPrompts.personaPromptA || savedPrompts.personaPromptB || savedPrompts.rulePrompt)) {
+    personaPromptA = savedPrompts.personaPromptA || "";
+    personaPromptB = savedPrompts.personaPromptB || "";
+    rulePrompt = savedPrompts.rulePrompt || "";
+    console.log("localStorageからロード:", personaPromptA, personaPromptB, rulePrompt);
+  } else {
+    // public から読み込み
+    try {
+      const [aRes, bRes, ruleRes] = await Promise.all([
+        fetch("/prompts/personaA.txt"),
+        fetch("/prompts/personaB.txt"),
+        fetch("/prompts/rule.txt")
+      ]);
+      personaPromptA = aRes.ok ? await aRes.text() : "";
+      personaPromptB = bRes.ok ? await bRes.text() : "";
+      rulePrompt = ruleRes.ok ? await ruleRes.text() : "";
+      console.log("publicからロード:", personaPromptA, personaPromptB, rulePrompt);
+    } catch (error) {
+      console.error("publicプロンプト読み込み失敗:", error);
+    }
   }
 }
 
@@ -100,9 +106,13 @@ async function sendData() {
 
   const base64Image = await toBase64(imageInput.files[0]);
 
+  // A/B + 固定プロンプト を合成
+  const promptACombined = `${personaPromptA}\n${rulePrompt}\n\n投稿者: ${username}\n感情: ${selectedEmotion}`;
+  const promptBCombined = `${personaPromptB}\n${rulePrompt}\n\n投稿者: ${username}\n感情: ${selectedEmotion}`;
+
   const requestData = {
-    promptA: currentMode === "A" ? personaPromptA : "",
-    promptB: currentMode === "B" ? personaPromptB : "",
+    promptA: currentMode === "A" ? promptACombined : "",
+    promptB: currentMode === "B" ? promptBCombined : "",
     userPrompt: userComment,
     image: base64Image,
     temperature: 0.7,
@@ -120,7 +130,7 @@ async function sendData() {
 
     const data = await response.json();
 
-    // コメントをモードごとに保持
+    // コメント保持
     if (currentMode === "A") {
       commentA = data.commentA || data.commentB || "応答がありません";
     } else {
