@@ -191,3 +191,14 @@ textarea {
   background: #2196f3;
   color: #fff;
 }
+/* =====================
+   額縁
+===================== */
+.preview img {
+  max-width: 100%;
+  border-radius: 12px;
+  display: block;
+  margin: 0 auto;
+  border: 6px solid #fff;       /* 額縁 */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* 影 */
+}
