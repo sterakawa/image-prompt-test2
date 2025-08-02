@@ -1,3 +1,6 @@
+/* =====================
+   基本スタイル
+===================== */
 body {
   font-family: 'Noto Sans JP', sans-serif;
   background: #fafafa;
@@ -11,6 +14,9 @@ body {
   padding: 16px;
 }
 
+/* =====================
+   写真アップロード
+===================== */
 .upload-area {
   display: block;
   background: #fff;
@@ -26,8 +32,49 @@ body {
 .preview img {
   max-width: 100%;
   border-radius: 12px;
+  display: block;
+  margin: 0 auto;
 }
 
+/* =====================
+   生成コメント（写真直下）
+===================== */
+.result-area {
+  margin-top: 12px;
+  margin-bottom: 16px;
+}
+
+.bubble {
+  display: inline-block;
+  max-width: 90%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  position: relative;
+  font-size: 14px;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+/* 吹き出しA/Bの色分け */
+.bubble-a {
+  background: #e3f2fd;
+}
+
+.bubble-b {
+  background: #e6f4ea;
+}
+
+/* 吹き出しのユーザー名 */
+.bubble .username {
+  display: block;
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+/* =====================
+   入力フィールド
+===================== */
 input[type="text"],
 textarea {
   width: 100%;
@@ -36,8 +83,13 @@ textarea {
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 14px;
+  background: #fff;
+  box-sizing: border-box;
 }
 
+/* =====================
+   感情ボタン
+===================== */
 .emotions {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -60,6 +112,9 @@ textarea {
   transform: scale(1.1);
 }
 
+/* =====================
+   送信ボタン
+===================== */
 .send-btn {
   width: 100%;
   padding: 12px;
@@ -69,37 +124,16 @@ textarea {
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
-.result-area {
-  margin-top: 20px;
+.send-btn:hover {
+  background: #1976d2;
 }
 
-.bubble {
-  display: inline-block;
-  max-width: 80%;
-  padding: 10px 14px;
-  border-radius: 16px;
-  margin-top: 8px;
-  position: relative;
-  font-size: 14px;
-}
-
-.bubble-a {
-  background: #e3f2fd;
-}
-
-.bubble-b {
-  background: #e6f4ea;
-}
-
-.bubble .username {
-  display: block;
-  font-size: 12px;
-  color: #555;
-  margin-bottom: 4px;
-}
-
+/* =====================
+   A/B切替ボタン（固定配置）
+===================== */
 .ab-toggle {
   position: fixed;
   bottom: 20px;
@@ -117,6 +151,7 @@ textarea {
   font-size: 18px;
   cursor: pointer;
   background: #ddd;
+  transition: background 0.2s;
 }
 
 .toggle-btn.active {
