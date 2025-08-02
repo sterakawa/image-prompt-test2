@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>画像＋プロンプト比較検証</title>
-  <!-- CSS 読み込み -->
   <link rel="stylesheet" href="styles.css">
-  <!-- JS 読み込み（deferでDOMロード後に実行） -->
   <script src="main.js" defer></script>
 </head>
 <body>
@@ -45,8 +43,8 @@
     <button class="emotion-btn" data-emotion="楽しい">😊</button>
     <button class="emotion-btn" data-emotion="悲しい">😢</button>
     <button class="emotion-btn" data-emotion="嬉しい">😁</button>
-     <button class="emotion-btn" data-emotion="安らぎ">😌</button>
-     <button class="emotion-btn" data-emotion="尊い">😇</button>
+    <button class="emotion-btn" data-emotion="安らぎ">😌</button>
+    <button class="emotion-btn" data-emotion="尊い">😇</button>
     <button class="emotion-btn" data-emotion="怒っている">😡</button>
     <button class="emotion-btn" data-emotion="恥ずかしい">😳</button>
     <button class="emotion-btn" data-emotion="驚いた">😱</button>
@@ -69,6 +67,17 @@
   <input type="number" id="topP" step="0.1" value="0.6" min="0.1" max="1.0">
   <span>(0.1〜1.0, 低いと単調・高いと自由)</span><br>
 
+  <!-- 履歴参照チェック -->
+  <label>
+    <input type="checkbox" id="useHistory" checked>
+    履歴を参照する
+  </label><br>
+
+  <!-- 履歴参照件数 -->
+  <label>履歴参照件数</label>
+  <input type="number" id="historyCount" value="3" min="1" max="10">
+  <span>(1〜10件)</span><br>
+
   <label>モデル選択</label>
   <select id="model">
     <option value="gpt-4.1-mini">gpt-4.1-mini</option>
@@ -86,18 +95,6 @@
   <h2>結果</h2>
   <div id="resultA" class="result-card">結果A: 応答がありません</div>
   <div id="resultB" class="result-card">結果B: 応答がありません</div>
-
-  <!-- エラーメッセージ（リトライ用） -->
-  <div id="errorMessage" class="error-message" style="display:none;">
-    コメント生成に失敗しました。<br>
-    <button id="retryBtn">再試行</button>
-  </div>
-
-  <!-- タグ抽出テスト用ボタン -->
-  <button id="extractBtn" type="button">タグ抽出テスト</button>
-
-  <!-- タグ結果表示 -->
-  <div id="tagResult" class="result-card"></div>
 
   <!-- 履歴表示 -->
   <h2>履歴</h2>
