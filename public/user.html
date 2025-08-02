@@ -7,6 +7,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="user.css">
   <script src="user.js" defer></script>
+  <style>
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
   <main class="container">
@@ -17,16 +22,14 @@
       <div id="previewArea" class="preview">写真をアップロード</div>
     </label>
 
-    <!-- 生成コメント（AとB両方用意） -->
-    <div id="resultArea">
-      <div id="resultBubbleA" class="bubble bubble-a hidden">
-        <span class="username"></span>
-        <p class="comment">ここに結果が表示されます</p>
-      </div>
-      <div id="resultBubbleB" class="bubble bubble-b hidden">
-        <span class="username"></span>
-        <p class="comment">ここに結果が表示されます</p>
-      </div>
+    <!-- 生成コメント（写真直下に配置：A/B両方用意） -->
+    <div id="resultBubbleA" class="bubble bubble-a hidden">
+      <span class="username"></span>
+      <p class="comment"></p>
+    </div>
+    <div id="resultBubbleB" class="bubble bubble-b hidden">
+      <span class="username"></span>
+      <p class="comment"></p>
     </div>
 
     <!-- 入力フォーム -->
