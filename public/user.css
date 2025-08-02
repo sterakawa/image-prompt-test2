@@ -71,7 +71,15 @@ body {
   color: #555;
   margin-bottom: 4px;
 }
+/* 初期は非表示 */
+#resultBubble {
+  display: none;
+}
 
+/* 表示状態 */
+#resultBubble.show {
+  display: inline-block;
+}
 /* =====================
    入力フィールド
 ===================== */
