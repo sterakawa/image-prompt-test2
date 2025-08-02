@@ -1,10 +1,21 @@
-// Jaconsole.log("user.js 読み込みテスト");
-
 // グローバル変数
 let selectedEmotion = "";
-let currentMode = "A"; // 初期状態はA
+let currentMode = "A";
+let personaPromptA = "";
+let personaPromptB = "";
 
+// ページロード時に localStorage から読み込む
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("user.js 読み込みテスト");
+
+  // 管理画面で保存されたプロンプトを読み込み
+  const savedPrompts = JSON.parse(localStorage.getItem("prompts"));
+  if (savedPrompts) {
+    personaPromptA = savedPrompts.personaPromptA || "";
+    personaPromptB = savedPrompts.personaPromptB || "";
+    console.log("ロードされたプロンプト:", personaPromptA, personaPromptB);
+  }
+
   // 感情ボタン
   document.querySelectorAll(".emotion-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -24,18 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // 送信ボタン
   document.getElementById("sendBtn").addEventListener("click", sendData);
 });
-
-// 画像プレビュー
-function previewImage(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById("previewArea").innerHTML = `<img src="${e.target.result}" alt="preview">`;
-  };
-  reader.readAsDataURL(file);
-}
 
 // A/Bモード切替
 function switchMode(mode) {
@@ -61,8 +60,8 @@ async function sendData() {
   const base64Image = await toBase64(imageInput.files[0]);
 
   const requestData = {
-    promptA: currentMode === "A" ? "人格Aの固定プロンプト" : "",
-    promptB: currentMode === "B" ? "人格Bの固定プロンプト" : "",
+    promptA: currentMode === "A" ? personaPromptA : "",
+    promptB: currentMode === "B" ? personaPromptB : "",
     userPrompt: userComment,
     image: base64Image,
     temperature: 0.7,
