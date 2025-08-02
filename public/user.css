@@ -192,45 +192,23 @@ textarea {
   color: #fff;
 }
 /* =====================
-   額縁
+   額縁・キャプチャ範囲
 ===================== */
+
+/* キャプチャ範囲全体に白背景と均等余白 */
+#captureArea {
+  background-color: #ffffff;
+  padding: 16px;        /* 写真とコメント周りの余白 */
+  border-radius: 14px;  /* 角丸 */
+}
+
+/* プレビュー画像に額縁と影 */
 .preview img {
   max-width: 100%;
   border-radius: 12px;
   display: block;
   margin: 0 auto;
-  border: 6px solid #fff;       /* 額縁 */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* 影 */
-}
-/* キャプチャ範囲全体に白背景と余白 */
-#captureArea {
-  background-color: #ffffff;
-  padding: 16px;         /* 写真とコメント周りの余白 */
-  border-radius: 14px;
-}
-
-/* プレビュー画像に額縁と影 */
-.preview img {
-  border: 10px solid #fff;   /* 額縁 */
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-/* バブルの上下にも少し余白追加 */
-.bubble {
-  margin-top: 12px;
-}
-/* キャプチャ範囲全体に白背景と均等余白 */
-#captureArea {
-  background-color: #ffffff;
-  padding: 16px;        /* 均等な余白 */
-  border-radius: 14px;  /* 角丸 */
-}
-
-/* プレビュー画像に白枠＋影 */
-.preview img {
   border: 8px solid #fff;   /* 控えめな額縁 */
-  border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
