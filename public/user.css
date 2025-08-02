@@ -220,3 +220,21 @@ textarea {
 .bubble {
   margin-top: 12px;
 }
+/* キャプチャ範囲全体に白背景と均等余白 */
+#captureArea {
+  background-color: #ffffff;
+  padding: 16px;        /* 均等な余白 */
+  border-radius: 14px;  /* 角丸 */
+}
+
+/* プレビュー画像に白枠＋影 */
+.preview img {
+  border: 8px solid #fff;   /* 控えめな額縁 */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* コメントバブルと画像の間に余白 */
+.bubble {
+  margin-top: 12px;
+}
