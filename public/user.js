@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("プロンプト読み込み失敗:", err);
   }
 
-  // 感情ボタンのイベント
+  // 感情ボタンイベント
   document.querySelectorAll(".emotion-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".emotion-btn").forEach(b => b.classList.remove("selected"));
@@ -48,6 +48,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 送信ボタン
   document.getElementById("sendBtn").addEventListener("click", sendData);
+
+  // 初期バブル非表示
+  document.getElementById("resultBubbleA").style.display = "none";
+  document.getElementById("resultBubbleB").style.display = "none";
 });
 
 // ===============================
@@ -58,8 +62,16 @@ function switchMode(mode) {
   document.getElementById("switchA").classList.toggle("active", mode === "A");
   document.getElementById("switchB").classList.toggle("active", mode === "B");
 
-  const bubble = document.getElementById("resultBubble");
-  bubble.className = `bubble bubble-${mode.toLowerCase()}`;
+  // A/Bバブル切替（送信済みコメントの切替表示も反映）
+  document.getElementById("resultBubbleA").style.display =
+    mode === "A" && document.querySelector("#resultBubbleA .comment").textContent
+      ? "inline-block"
+      : "none";
+
+  document.getElementById("resultBubbleB").style.display =
+    mode === "B" && document.querySelector("#resultBubbleB .comment").textContent
+      ? "inline-block"
+      : "none";
 }
 
 // ===============================
@@ -82,8 +94,8 @@ async function sendData() {
   }
 
   // --- モードごとにプロンプト決定（+固定ルール） ---
-  const combinedPromptA = `${personaPromptA}\n${rulePrompt}`;
-  const combinedPromptB = `${personaPromptB}\n${rulePrompt}`;
+  const combinedPromptA = `${personaPromptA}\n\n${rulePrompt}`;
+  const combinedPromptB = `${personaPromptB}\n\n${rulePrompt}`;
 
   // 送信用にリサイズ＆Base64化
   const base64Image = await resizeImage(imageInput.files[0], 512);
@@ -114,13 +126,21 @@ async function sendData() {
 
     const data = await response.json();
 
-    // 結果表示
-    document.querySelector("#resultBubble .username").textContent = username;
-    document.querySelector("#resultBubble .comment").textContent =
+    // 対応バブル選択
+    const bubbleId = currentMode === "A" ? "resultBubbleA" : "resultBubbleB";
+    const targetBubble = document.getElementById(bubbleId);
+
+    // バブル更新
+    targetBubble.querySelector(".username").textContent = username;
+    targetBubble.querySelector(".comment").textContent =
       data.commentA || data.commentB || "応答がありません";
 
-    // 初回は非表示だったバブルを表示
-    document.getElementById("resultBubble").style.display = "inline-block";
+    // 表示
+    targetBubble.style.display = "inline-block";
+
+    // 他方のバブルは非表示
+    const otherBubbleId = currentMode === "A" ? "resultBubbleB" : "resultBubbleA";
+    document.getElementById(otherBubbleId).style.display = "none";
 
   } catch (error) {
     console.error("送信エラー:", error);
@@ -155,12 +175,29 @@ function resizeImage(file, maxSize = 512) {
     };
     img.onload = () => {
       const canvas = document.createElement("canvas");
-      const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
-      canvas.width = img.width * scale;
-      canvas.height = img.height * scale;
+      let width = img.width;
+      let height = img.height;
+
+      // 長辺基準で縮小
+      if (width > height) {
+        if (width > maxSize) {
+          height *= maxSize / width;
+          width = maxSize;
+        }
+      } else {
+        if (height > maxSize) {
+          width *= maxSize / height;
+          height = maxSize;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+
       const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL("image/jpeg", 0.8)); // JPEG圧縮率80%
+      ctx.drawImage(img, 0, 0, width, height);
+
+      resolve(canvas.toDataURL("image/jpeg", 0.8)); // JPEG圧縮80%
     };
     reader.readAsDataURL(file);
   });
