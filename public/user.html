@@ -6,9 +6,13 @@
   <title>ユーザーテスト画面</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="user.css">
-  <script src="user.js" defer></script>
-  <!-- html2canvasはdeferではなく通常読み込みでOK -->
+
+  <!-- html2canvas を先に読み込む -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <!-- user.js は defer で最後に -->
+  <script src="user.js" defer></script>
+
   <style>
     .hidden { display: none; }
   </style>
