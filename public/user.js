@@ -3,11 +3,9 @@
 // ===============================
 let selectedEmotion = "";   // 感情ボタン選択
 let currentMode = "A";      // A/Bモード
-let personaPromptA = "";    // 人格Aプロンプト
-let personaPromptB = "";    // 人格Bプロンプト
-let rulePrompt = "";        // 固定プロンプト
-let commentA = "";          // Aコメント
-let commentB = "";          // Bコメント
+let personaPromptA = "";    // personaA.txt
+let personaPromptB = "";    // personaB.txt
+let rulePrompt = "";        // rule.txt
 
 // ===============================
 // ページロード時処理
@@ -15,10 +13,24 @@ let commentB = "";          // Bコメント
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("user.js 読み込みテスト");
 
-  // localStorage or public からプロンプト読み込み
-  await loadPrompts();
+  // --- プロンプト読み込み ---
+  try {
+    const [aText, bText, ruleText] = await Promise.all([
+      fetch("/prompts/personaA.txt").then(res => res.text()),
+      fetch("/prompts/personaB.txt").then(res => res.text()),
+      fetch("/prompts/rule.txt").then(res => res.text())
+    ]);
 
-  // 感情ボタンイベント
+    personaPromptA = aText.trim();
+    personaPromptB = bText.trim();
+    rulePrompt = ruleText.trim();
+
+    console.log("ロードされたプロンプト:", { personaPromptA, personaPromptB, rulePrompt });
+  } catch (err) {
+    console.error("プロンプト読み込み失敗:", err);
+  }
+
+  // 感情ボタンのイベント
   document.querySelectorAll(".emotion-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".emotion-btn").forEach(b => b.classList.remove("selected"));
@@ -39,35 +51,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // ===============================
-// プロンプト読み込み
-// ===============================
-async function loadPrompts() {
-  const savedPrompts = JSON.parse(localStorage.getItem("prompts"));
-
-  if (savedPrompts && (savedPrompts.personaPromptA || savedPrompts.personaPromptB || savedPrompts.rulePrompt)) {
-    personaPromptA = savedPrompts.personaPromptA || "";
-    personaPromptB = savedPrompts.personaPromptB || "";
-    rulePrompt = savedPrompts.rulePrompt || "";
-    console.log("localStorageからロード:", personaPromptA, personaPromptB, rulePrompt);
-  } else {
-    // public から読み込み
-    try {
-      const [aRes, bRes, ruleRes] = await Promise.all([
-        fetch("/prompts/personaA.txt"),
-        fetch("/prompts/personaB.txt"),
-        fetch("/prompts/rule.txt")
-      ]);
-      personaPromptA = aRes.ok ? await aRes.text() : "";
-      personaPromptB = bRes.ok ? await bRes.text() : "";
-      rulePrompt = ruleRes.ok ? await ruleRes.text() : "";
-      console.log("publicからロード:", personaPromptA, personaPromptB, rulePrompt);
-    } catch (error) {
-      console.error("publicプロンプト読み込み失敗:", error);
-    }
-  }
-}
-
-// ===============================
 // A/Bモード切替
 // ===============================
 function switchMode(mode) {
@@ -77,18 +60,6 @@ function switchMode(mode) {
 
   const bubble = document.getElementById("resultBubble");
   bubble.className = `bubble bubble-${mode.toLowerCase()}`;
-
-  updateBubble();
-}
-
-// ===============================
-// コメント表示更新
-// ===============================
-function updateBubble() {
-  const username = document.getElementById("username").value || "匿名";
-  document.querySelector("#resultBubble .username").textContent = username;
-  document.querySelector("#resultBubble .comment").textContent =
-    currentMode === "A" ? commentA : commentB;
 }
 
 // ===============================
@@ -104,15 +75,23 @@ async function sendData() {
     return;
   }
 
+  // プロンプト未読み込み時はエラー
+  if (!personaPromptA && !personaPromptB) {
+    alert("人格プロンプトが読み込まれていません。/prompts/ を確認してください。");
+    return;
+  }
+
+  // --- モードごとにプロンプト決定（+固定ルール） ---
+  const combinedPromptA = `${personaPromptA}\n${rulePrompt}`;
+  const combinedPromptB = `${personaPromptB}\n${rulePrompt}`;
+
+  // Base64変換
   const base64Image = await toBase64(imageInput.files[0]);
 
-  // A/B + 固定プロンプト を合成
-  const promptACombined = `${personaPromptA}\n${rulePrompt}\n\n投稿者: ${username}\n感情: ${selectedEmotion}`;
-  const promptBCombined = `${personaPromptB}\n${rulePrompt}\n\n投稿者: ${username}\n感情: ${selectedEmotion}`;
-
+  // APIリクエストデータ
   const requestData = {
-    promptA: currentMode === "A" ? promptACombined : "",
-    promptB: currentMode === "B" ? promptBCombined : "",
+    promptA: currentMode === "A" ? combinedPromptA : "",
+    promptB: currentMode === "B" ? combinedPromptB : "",
     userPrompt: userComment,
     image: base64Image,
     temperature: 0.7,
@@ -130,14 +109,14 @@ async function sendData() {
 
     const data = await response.json();
 
-    // コメント保持
-    if (currentMode === "A") {
-      commentA = data.commentA || data.commentB || "応答がありません";
-    } else {
-      commentB = data.commentA || data.commentB || "応答がありません";
-    }
+    // 結果表示
+    document.querySelector("#resultBubble .username").textContent = username;
+    document.querySelector("#resultBubble .comment").textContent =
+      data.commentA || data.commentB || "応答がありません";
 
-    updateBubble();
+    // 初回は非表示だったバブルを表示
+    document.getElementById("resultBubble").style.display = "inline-block";
+
   } catch (error) {
     console.error("送信エラー:", error);
     alert("送信に失敗しました。もう一度お試しください。");
