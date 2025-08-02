@@ -14,24 +14,28 @@
 <body>
   <main class="container">
 
-    <!-- 写真アップロード -->
-    <label class="upload-area">
-      <input type="file" id="imageInput" accept="image/*" hidden>
-      <div id="previewArea" class="preview">写真をアップロード</div>
-    </label>
+    <!-- キャプチャ対象エリア -->
+    <div id="captureArea">
 
-    <!-- 生成コメント（写真直下：A/B両方用意） -->
-    <div id="resultBubbleA" class="bubble bubble-a hidden">
-      <span class="username"></span>
-      <p class="comment"></p>
-    </div>
-    <div id="resultBubbleB" class="bubble bubble-b hidden">
-      <span class="username"></span>
-      <p class="comment"></p>
+      <!-- 写真アップロード（額縁付き） -->
+      <label class="upload-area">
+        <input type="file" id="imageInput" accept="image/*" hidden>
+        <div id="previewArea" class="preview">写真をアップロード</div>
+      </label>
+
+      <!-- 生成コメント（A/B両方） -->
+      <div id="resultBubbleA" class="bubble bubble-a hidden">
+        <span class="username"></span>
+        <p class="comment"></p>
+      </div>
+      <div id="resultBubbleB" class="bubble bubble-b hidden">
+        <span class="username"></span>
+        <p class="comment"></p>
+      </div>
     </div>
 
-    <!-- 感情ボタン（横スクロール） -->
-    <div class="emotions-wrapper">
+    <!-- 感情ボタン（横スライド1列） -->
+    <div class="emotions-scroll">
       <div class="emotions">
         <button class="emotion-btn" data-emotion="楽しい">😊</button>
         <button class="emotion-btn" data-emotion="悲しい">😢</button>
@@ -48,8 +52,11 @@
     <input type="text" id="username" placeholder="名前（任意）">
     <textarea id="userComment" rows="2" placeholder="コメントを書く（任意）"></textarea>
 
-    <!-- 送信ボタン -->
-    <button id="sendBtn" class="send-btn">送信</button>
+    <!-- 送信・共有ボタン横並び -->
+    <div class="button-row">
+      <button id="sendBtn" class="send-btn">送信</button>
+      <button id="shareBtn" class="share-btn">共有</button>
+    </div>
 
   </main>
 
