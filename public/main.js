@@ -62,9 +62,12 @@ async function sendData() {
   const rulePrompt = rulePromptEl.value;
   const userPrompt = inputPromptEl.value;
 
+  // === 履歴参照サマリー取得 ===
+  const historySummary = getRecentHistorySummary();
+
   // 合成プロンプト
-  const fixedPromptA = `${personaA}\n${rulePrompt}\n\n投稿者: ${username}\n感情: ${selectedEmotion}`;
-  const fixedPromptB = `${personaB}\n${rulePrompt}\n\n投稿者: ${username}\n感情: ${selectedEmotion}`;
+  const fixedPromptA = `${personaA}\n${rulePrompt}\n${historySummary}\n\n投稿者: ${username}\n感情: ${selectedEmotion}`;
+  const fixedPromptB = `${personaB}\n${rulePrompt}\n${historySummary}\n\n投稿者: ${username}\n感情: ${selectedEmotion}`;
 
   // パラメータ
   const temperature = parseFloat(document.getElementById("temperature").value) || 0.7;
@@ -154,6 +157,30 @@ async function extractTagsAndSave(base64Image, historyEntry) {
     // タグが取れなくても履歴だけ保存
     saveHistory(historyEntry);
   }
+}
+
+// ===============================
+// 履歴まとめ生成（件数指定）
+// ===============================
+function getRecentHistorySummary() {
+  const useHistory = document.getElementById("useHistory")?.checked;
+  if (!useHistory) {
+    return "過去履歴は参照せず、新しい写真についてのみコメントしてください。";
+  }
+
+  const count = parseInt(document.getElementById("historyCount").value) || 3;
+  const history = JSON.parse(localStorage.getItem("history") || "[]");
+  const recent = history.slice(0, count);
+
+  if (!recent.length) {
+    return "過去履歴は参照せず、新しい写真についてのみコメントしてください。";
+  }
+
+  return `過去${recent.length}件のコメント履歴を参考にしてください:\n` + 
+    recent.map((item, i) => {
+      const tags = item.tags?.join(", ") || "タグなし";
+      return `${i + 1}. 感情: ${item.emotion || "なし"} / タグ: ${tags} / コメント: ${item.userPrompt || "なし"}`;
+    }).join("\n");
 }
 
 // ===============================
