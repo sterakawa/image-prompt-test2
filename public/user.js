@@ -6,8 +6,6 @@ let currentMode = "A";      // A/Bモード
 let personaPromptA = "";    // personaA.txt
 let personaPromptB = "";    // personaB.txt
 let rulePrompt = "";        // rule.txt
-let lastCommentA = "";      // 最新Aコメント
-let lastCommentB = "";      // 最新Bコメント
 
 // ===============================
 // ページロード時処理
@@ -60,14 +58,8 @@ function switchMode(mode) {
   document.getElementById("switchA").classList.toggle("active", mode === "A");
   document.getElementById("switchB").classList.toggle("active", mode === "B");
 
-  // 表示切り替え
-  if (mode === "A") {
-    document.getElementById("resultBubbleA").classList.remove("hidden");
-    document.getElementById("resultBubbleB").classList.add("hidden");
-  } else {
-    document.getElementById("resultBubbleB").classList.remove("hidden");
-    document.getElementById("resultBubbleA").classList.add("hidden");
-  }
+  const bubble = document.getElementById("resultBubble");
+  bubble.className = `bubble bubble-${mode.toLowerCase()}`;
 }
 
 // ===============================
@@ -93,13 +85,13 @@ async function sendData() {
   const combinedPromptA = `${personaPromptA}\n${rulePrompt}`;
   const combinedPromptB = `${personaPromptB}\n${rulePrompt}`;
 
-  // Base64変換
-  const base64Image = await toBase64(imageInput.files[0]);
+  // 送信用にリサイズ＆Base64化
+  const base64Image = await resizeImage(imageInput.files[0], 512);
 
   // APIリクエストデータ
   const requestData = {
-    promptA: combinedPromptA,
-    promptB: combinedPromptB,
+    promptA: currentMode === "A" ? combinedPromptA : "",
+    promptB: currentMode === "B" ? combinedPromptB : "",
     userPrompt: userComment,
     image: base64Image,
     temperature: 0.7,
@@ -115,36 +107,29 @@ async function sendData() {
       body: JSON.stringify(requestData)
     });
 
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errText}`);
+    }
+
     const data = await response.json();
 
-    // 最新コメント保存
-    lastCommentA = data.commentA || "応答がありません";
-    lastCommentB = data.commentB || "応答がありません";
+    // 結果表示
+    document.querySelector("#resultBubble .username").textContent = username;
+    document.querySelector("#resultBubble .comment").textContent =
+      data.commentA || data.commentB || "応答がありません";
 
-    // それぞれ更新
-    document.querySelector("#resultBubbleA .username").textContent = username;
-    document.querySelector("#resultBubbleA .comment").textContent = lastCommentA;
-
-    document.querySelector("#resultBubbleB .username").textContent = username;
-    document.querySelector("#resultBubbleB .comment").textContent = lastCommentB;
-
-    // 現在モードに応じて表示
-    if (currentMode === "A") {
-      document.getElementById("resultBubbleA").classList.remove("hidden");
-      document.getElementById("resultBubbleB").classList.add("hidden");
-    } else {
-      document.getElementById("resultBubbleB").classList.remove("hidden");
-      document.getElementById("resultBubbleA").classList.add("hidden");
-    }
+    // 初回は非表示だったバブルを表示
+    document.getElementById("resultBubble").style.display = "inline-block";
 
   } catch (error) {
     console.error("送信エラー:", error);
-    alert("送信に失敗しました。もう一度お試しください。");
+    alert(`送信に失敗しました (${error.message})`);
   }
 }
 
 // ===============================
-// 画像プレビュー
+// 画像プレビュー（フル解像度）
 // ===============================
 function previewImage(event) {
   const file = event.target.files[0];
@@ -158,13 +143,25 @@ function previewImage(event) {
 }
 
 // ===============================
-// 画像をBase64に変換
+// 画像リサイズ & Base64化
 // ===============================
-function toBase64(file) {
-  return new Promise((resolve, reject) => {
+function resizeImage(file, maxSize = 512) {
+  return new Promise((resolve) => {
+    const img = new Image();
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
+
+    reader.onload = (e) => {
+      img.src = e.target.result;
+    };
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", 0.8)); // JPEG圧縮率80%
+    };
     reader.readAsDataURL(file);
   });
 }
