@@ -197,6 +197,10 @@ function loadSavedPrompts() {
 // ===============================
 function saveHistory(entry) {
   const history = JSON.parse(localStorage.getItem("history") || "[]");
+
+  // 履歴IDを生成
+  entry.id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
   history.unshift(entry); // 先頭に追加
   if (history.length > 20) history.pop(); // 最大20件保持
   localStorage.setItem("history", JSON.stringify(history));
@@ -219,7 +223,8 @@ function displayHistory() {
         <em>${item.userPrompt || "コメントなし"}</em><br>
         A: ${item.commentA || "なし"}<br>
         B: ${item.commentB || "なし"}<br>
-        タグ: ${item.tags?.join(", ") || "なし"}
+        タグ: ${item.tags?.join(", ") || "なし"}<br>
+        <small>ID: ${item.id}</small>
       </div>
       <hr>`;
   }).join("");
