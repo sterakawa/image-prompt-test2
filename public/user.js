@@ -94,6 +94,9 @@ async function sendData() {
     document.querySelector("#resultBubble .comment").textContent =
       data.commentA || data.commentB || "応答がありません";
 
+    // 初期非表示 → 生成後に表示
+    document.getElementById("resultBubble").classList.add("show");
+
   } catch (error) {
     console.error("送信エラー:", error);
     alert("送信に失敗しました。もう一度お試しください。");
