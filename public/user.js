@@ -61,7 +61,7 @@ function switchMode(mode) {
   document.getElementById("switchA").classList.toggle("active", mode === "A");
   document.getElementById("switchB").classList.toggle("active", mode === "B");
 
-  // 表示を切り替える（データは常に両方保持済み）
+  // 表示を切り替える
   document.getElementById("resultBubbleA").style.display = (mode === "A") ? "inline-block" : "none";
   document.getElementById("resultBubbleB").style.display = (mode === "B") ? "inline-block" : "none";
 }
@@ -89,25 +89,45 @@ async function sendData() {
   const combinedPromptA = `${personaPromptA}\n${rulePrompt}`;
   const combinedPromptB = `${personaPromptB}\n${rulePrompt}`;
 
+  // 感情をコメントに追加
+  const emotionText = selectedEmotion ? `感情: ${selectedEmotion}\n` : "";
+
   // 送信用にリサイズ＆Base64化
   const base64Image = await resizeImage(imageInput.files[0], 512);
 
- // 感情をコメントに追加（未選択なら空）
-const emotionText = selectedEmotion ? `感情: ${selectedEmotion}\n` : "";
+  // APIリクエストデータ（常に両方送る）
+  const requestData = {
+    promptA: combinedPromptA,
+    promptB: combinedPromptB,
+    userPrompt: `${emotionText}${userComment}`,
+    image: base64Image,
+    temperature: 0.7,
+    maxTokens: 200,
+    topP: 0.6,
+    model: "gpt-4.1-mini"
+  };
 
-// APIリクエストデータ（常に両方送る）
-const requestData = {
-  promptA: combinedPromptA,
-  promptB: combinedPromptB,
-  userPrompt: `${emotionText}${userComment}`,  // ←ここで感情を反映
-  image: base64Image,
-  temperature: 0.7,
-  maxTokens: 200,
-  topP: 0.6,
-  model: "gpt-4.1-mini"
-};
-  
   console.log("送信データ:", requestData);
+
+  // --- 送信中UI ---
+  const sendBtn = document.getElementById("sendBtn");
+  sendBtn.disabled = true;
+  sendBtn.textContent = "送信中…";
+
+  const bubbleA = document.getElementById("resultBubbleA");
+  const bubbleB = document.getElementById("resultBubbleB");
+
+  bubbleA.classList.remove("hidden");
+  bubbleB.classList.remove("hidden");
+
+  bubbleA.classList.add("loading");
+  bubbleB.classList.add("loading");
+
+  bubbleA.querySelector(".username").textContent = username;
+  bubbleB.querySelector(".username").textContent = username;
+
+  bubbleA.querySelector(".comment").textContent = "";
+  bubbleB.querySelector(".comment").textContent = "";
 
   try {
     const response = await fetch("/api/analyze", {
@@ -124,24 +144,25 @@ const requestData = {
     const data = await response.json();
     console.log("受信データ:", data);
 
-    // 両方のバブルを更新
-    document.querySelector("#resultBubbleA .username").textContent = username;
-    document.querySelector("#resultBubbleA .comment").textContent = data.commentA || "応答がありません";
-
-    document.querySelector("#resultBubbleB .username").textContent = username;
-    document.querySelector("#resultBubbleB .comment").textContent = data.commentB || "応答がありません";
-
-    // 現在モードに合わせて表示切り替え
-    switchMode(currentMode);
+    // バブル更新
+    bubbleA.querySelector(".comment").textContent = data.commentA || "応答がありません";
+    bubbleB.querySelector(".comment").textContent = data.commentB || "応答がありません";
 
   } catch (error) {
     console.error("送信エラー:", error);
-    alert(`送信に失敗しました (${error.message})`);
+    bubbleA.querySelector(".comment").textContent = "エラーが発生しました";
+    bubbleB.querySelector(".comment").textContent = "エラーが発生しました";
+  } finally {
+    bubbleA.classList.remove("loading");
+    bubbleB.classList.remove("loading");
+    sendBtn.disabled = false;
+    sendBtn.textContent = "送信";
+    switchMode(currentMode);
   }
 }
 
 // ===============================
-// 画像プレビュー（フル解像度）
+// 画像プレビュー
 // ===============================
 function previewImage(event) {
   const file = event.target.files[0];
@@ -172,28 +193,27 @@ function resizeImage(file, maxSize = 512) {
       canvas.height = img.height * scale;
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL("image/jpeg", 0.8)); // JPEG圧縮率80%
+      resolve(canvas.toDataURL("image/jpeg", 0.8));
     };
     reader.readAsDataURL(file);
   });
 }
 
 // ===============================
-// 共有（キャプチャ）機能
+// 共有機能
 // ===============================
 async function shareCapture() {
   try {
     const target = document.getElementById("captureArea");
 
-    // html2canvas読み込み（CDN前提）
     if (typeof html2canvas === "undefined") {
       alert("html2canvas が読み込まれていません");
       return;
     }
 
     const canvas = await html2canvas(target, {
-      backgroundColor: "#ffffff", // 背景白
-      scale: 2 // 高解像度化
+      backgroundColor: "#ffffff",
+      scale: 2
     });
 
     const dataUrl = canvas.toDataURL("image/png");
@@ -204,10 +224,9 @@ async function shareCapture() {
       await navigator.share({
         files: [file],
         title: "フォトコメント",
-        text: "写真とコメントを共有します"
+        text: "写真とコメントを送ります"
       });
     } else {
-      // 未対応ブラウザ：画像ダウンロード
       const link = document.createElement("a");
       link.href = dataUrl;
       link.download = "share.png";
