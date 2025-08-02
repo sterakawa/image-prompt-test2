@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ユーザーテスト画面</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="user.css">
+  <script src="user.js" defer></script>
+</head>
+<body>
+  <main class="container">
+
+    <!-- 写真アップロード -->
+    <label class="upload-area">
+      <input type="file" id="imageInput" accept="image/*" hidden>
+      <div id="previewArea" class="preview">写真をアップロード</div>
+    </label>
+
+    <!-- ユーザー名・コメント -->
+    <input type="text" id="username" placeholder="名前（任意）">
+    <textarea id="userComment" rows="2" placeholder="コメントを書く（任意）"></textarea>
+
+    <!-- 感情ボタン -->
+    <div class="emotions">
+      <button class="emotion-btn" data-emotion="楽しい">😊</button>
+      <button class="emotion-btn" data-emotion="悲しい">😢</button>
+      <button class="emotion-btn" data-emotion="嬉しい">😁</button>
+      <button class="emotion-btn" data-emotion="安らぎ">😌</button>
+      <button class="emotion-btn" data-emotion="尊い">😇</button>
+      <button class="emotion-btn" data-emotion="怒っている">😡</button>
+      <button class="emotion-btn" data-emotion="恥ずかしい">😳</button>
+      <button class="emotion-btn" data-emotion="驚いた">😱</button>
+    </div>
+
+    <!-- 送信ボタン -->
+    <button id="sendBtn" class="send-btn">送信</button>
+
+    <!-- 結果表示 -->
+    <div id="resultArea" class="result-area">
+      <div id="resultBubble" class="bubble bubble-a">
+        <span class="username"></span>
+        <p class="comment">ここに結果が表示されます</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- A/B切替ボタン -->
+  <div class="ab-toggle">
+    <button id="switchA" class="toggle-btn active">A</button>
+    <button id="switchB" class="toggle-btn">B</button>
+  </div>
+</body>
+</html>
