@@ -56,8 +56,8 @@ body {
   padding: 12px 16px;
   border-radius: 16px;
   position: relative;
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 16px;        /* ←フォントサイズを16pxに変更 */
+  line-height: 1.6;
   word-wrap: break-word;
   margin-top: 12px;
 }
@@ -71,12 +71,9 @@ body {
   background: #e6f4ea;
 }
 
-/* 吹き出しのユーザー名 */
+/* 吹き出しのユーザー名を非表示 */
 .bubble .username {
-  display: block;
-  font-size: 12px;
-  color: #555;
-  margin-bottom: 4px;
+  display: none;          /* ←非表示 */
 }
 
 /* 初期非表示 */
