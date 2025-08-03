@@ -48,15 +48,17 @@ body {
 }
 ===================== */
 
-/* --- 新デザイン --- */
+/* 破線枠は既存のまま活かす */
+
+/* --- 写真 --- */
 .preview img {
   max-width: 100%;
-  border: none;              /* 白台削除 */
-  box-shadow: none;          /* 影削除 */
-  border-radius: 6px;        /* 薄めの角丸でスクショ感 */
+  border: 4px solid #fff;   /* 白台として薄めの枠を残す */
+  border-radius: 6px;       /* 軽い角丸 */
+  box-shadow: none;         /* 影を削除してフラットに */
   display: block;
   margin: 0 auto;
-  background-color: #fff;    /* 背景白で自然に馴染ませる */
+  background-color: #fff;   /* 背景白でUIと馴染ませる */
 }
 
 
