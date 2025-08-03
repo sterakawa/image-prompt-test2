@@ -274,13 +274,13 @@ function resetUI() {
   document.querySelector("#resultBubbleA .comment").textContent = "";
   document.querySelector("#resultBubbleB .comment").textContent = "";
 
-  // バブル非表示（hidden＋displayもリセット）
+  // バブル非表示（完全リセット）
   const bubbleA = document.getElementById("resultBubbleA");
   const bubbleB = document.getElementById("resultBubbleB");
   bubbleA.classList.add("hidden");
   bubbleB.classList.add("hidden");
-  bubbleA.style.display = "none";
-  bubbleB.style.display = "none";
+  bubbleA.style.display = "none";   // ← これを明示的に追加
+  bubbleB.style.display = "none";   // ← これを明示的に追加
 
   // モードをAに戻す
   switchMode("A");
