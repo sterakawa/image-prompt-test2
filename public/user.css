@@ -37,7 +37,7 @@ body {
   margin-bottom: 16px;
   cursor: pointer;
 }
-
+/* =====================旧デザイン
 .preview img {
   max-width: 100%;
   border: 8px solid #fff;   /* 額縁 */
@@ -46,6 +46,19 @@ body {
   display: block;
   margin: 0 auto;
 }
+===================== */
+
+/* --- 新デザイン --- */
+.preview img {
+  max-width: 100%;
+  border: none;              /* 白台削除 */
+  box-shadow: none;          /* 影削除 */
+  border-radius: 6px;        /* 薄めの角丸でスクショ感 */
+  display: block;
+  margin: 0 auto;
+  background-color: #fff;    /* 背景白で自然に馴染ませる */
+}
+
 
 /* =====================
    コメントバブル
