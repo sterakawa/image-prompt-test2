@@ -95,11 +95,11 @@ async function sendData() {
   // 送信用にリサイズ＆Base64化
   const base64Image = await resizeImage(imageInput.files[0], 512);
 
-  // APIリクエストデータ（常に両方送る）※ユーザー名追加
+  // APIリクエストデータ（常に両方送る）※ユーザー名も反映
   const requestData = {
     promptA: combinedPromptA,
     promptB: combinedPromptB,
-    userPrompt: `名前: ${username}\n${emotionText}${userComment}`,  // ←ユーザー名反映
+    userPrompt: `名前: ${username}\n${emotionText}${userComment}`,
     image: base64Image,
     temperature: 0.7,
     maxTokens: 200,
@@ -197,7 +197,7 @@ function resizeImage(file, maxSize = 512) {
 }
 
 // ===============================
-// 共有機能
+// 共有機能（成功時フェード＋リセット）
 // ===============================
 async function shareCapture() {
   try {
@@ -223,15 +223,54 @@ async function shareCapture() {
         title: "フォトコメント",
         text: "写真とコメントを送ります"
       });
+
+      triggerResetAnimation(); // 成功時のみリセット
     } else {
       const link = document.createElement("a");
       link.href = dataUrl;
       link.download = "share.png";
       link.click();
+
+      triggerResetAnimation(); // 保存完了時もリセット
     }
 
   } catch (error) {
     console.error("共有エラー:", error);
     alert("共有に失敗しました");
   }
+}
+
+// ===============================
+// 白フェード＆リセット処理
+// ===============================
+function triggerResetAnimation() {
+  const overlay = document.getElementById("fadeOverlay");
+  overlay.classList.add("active");
+
+  // ボタン無効化
+  document.querySelectorAll("button").forEach(btn => btn.disabled = true);
+
+  setTimeout(() => {
+    resetUI();
+    overlay.classList.remove("active");
+    document.querySelectorAll("button").forEach(btn => btn.disabled = false);
+  }, 500);
+}
+
+// ===============================
+// UI初期化
+// ===============================
+function resetUI() {
+  document.getElementById("imageInput").value = "";
+  document.getElementById("previewArea").innerHTML = "写真をアップロード";
+  document.getElementById("username").value = "";
+  document.getElementById("userComment").value = "";
+  document.querySelectorAll(".emotion-btn").forEach(b => b.classList.remove("selected"));
+  selectedEmotion = "";
+  currentMode = "A";
+
+  document.getElementById("resultBubbleA").classList.add("hidden");
+  document.getElementById("resultBubbleB").classList.add("hidden");
+
+  switchMode("A");
 }
