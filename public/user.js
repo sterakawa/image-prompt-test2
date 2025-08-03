@@ -54,16 +54,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // ===============================
-// A/Bモード切替
+// A/Bモード切替（hidden尊重）
 // ===============================
 function switchMode(mode) {
   currentMode = mode;
   document.getElementById("switchA").classList.toggle("active", mode === "A");
   document.getElementById("switchB").classList.toggle("active", mode === "B");
 
-  // 表示を切り替える
-  document.getElementById("resultBubbleA").style.display = (mode === "A") ? "inline-block" : "none";
-  document.getElementById("resultBubbleB").style.display = (mode === "B") ? "inline-block" : "none";
+  const bubbleA = document.getElementById("resultBubbleA");
+  const bubbleB = document.getElementById("resultBubbleB");
+
+  // hiddenクラスがある場合は強制非表示
+  bubbleA.style.display = bubbleA.classList.contains("hidden")
+    ? "none"
+    : (mode === "A" ? "inline-block" : "none");
+
+  bubbleB.style.display = bubbleB.classList.contains("hidden")
+    ? "none"
+    : (mode === "B" ? "inline-block" : "none");
 }
 
 // ===============================
@@ -95,7 +103,7 @@ async function sendData() {
   // 送信用にリサイズ＆Base64化
   const base64Image = await resizeImage(imageInput.files[0], 512);
 
-  // APIリクエストデータ（常に両方送る）※ユーザー名も反映
+  // APIリクエストデータ（常に両方送る）
   const requestData = {
     promptA: combinedPromptA,
     promptB: combinedPromptB,
@@ -274,7 +282,7 @@ function resetUI() {
   document.querySelector("#resultBubbleA .comment").textContent = "";
   document.querySelector("#resultBubbleB .comment").textContent = "";
 
-  // バブル完全非表示（inline-blockを強制解除）
+  // バブル完全非表示
   const bubbleA = document.getElementById("resultBubbleA");
   const bubbleB = document.getElementById("resultBubbleB");
 
@@ -282,4 +290,7 @@ function resetUI() {
   bubbleB.classList.add("hidden");
   bubbleA.style.display = "none";
   bubbleB.style.display = "none";
+
+  // モード切替初期化
+  switchMode("A");
 }
