@@ -61,7 +61,7 @@ function switchMode(mode) {
   document.getElementById("switchA").classList.toggle("active", mode === "A");
   document.getElementById("switchB").classList.toggle("active", mode === "B");
 
-  // 表示切替
+  // 表示を切り替える
   document.getElementById("resultBubbleA").style.display = (mode === "A") ? "inline-block" : "none";
   document.getElementById("resultBubbleB").style.display = (mode === "B") ? "inline-block" : "none";
 }
@@ -79,7 +79,7 @@ async function sendData() {
     return;
   }
 
-  // プロンプト未読み込み時
+  // プロンプト未読み込み時はエラー
   if (!personaPromptA && !personaPromptB) {
     alert("人格プロンプトが読み込まれていません。/prompts/ を確認してください。");
     return;
@@ -95,7 +95,7 @@ async function sendData() {
   // 送信用にリサイズ＆Base64化
   const base64Image = await resizeImage(imageInput.files[0], 512);
 
-  // APIリクエストデータ（常に両方送る）
+  // APIリクエストデータ（常に両方送る）※ユーザー名も反映
   const requestData = {
     promptA: combinedPromptA,
     promptB: combinedPromptB,
@@ -258,9 +258,10 @@ function triggerResetAnimation() {
 }
 
 // ===============================
-// UI初期化（写真・コメント・入力欄全て）
+// UI初期化（バブルも完全リセット）
 // ===============================
 function resetUI() {
+  // 入力リセット
   document.getElementById("imageInput").value = "";
   document.getElementById("previewArea").innerHTML = "写真をアップロード";
   document.getElementById("username").value = "";
@@ -269,12 +270,18 @@ function resetUI() {
   selectedEmotion = "";
   currentMode = "A";
 
-  // コメントもリセット
+  // コメントリセット
   document.querySelector("#resultBubbleA .comment").textContent = "";
   document.querySelector("#resultBubbleB .comment").textContent = "";
 
-  document.getElementById("resultBubbleA").classList.add("hidden");
-  document.getElementById("resultBubbleB").classList.add("hidden");
+  // バブル非表示（hidden＋displayもリセット）
+  const bubbleA = document.getElementById("resultBubbleA");
+  const bubbleB = document.getElementById("resultBubbleB");
+  bubbleA.classList.add("hidden");
+  bubbleB.classList.add("hidden");
+  bubbleA.style.display = "none";
+  bubbleB.style.display = "none";
 
+  // モードをAに戻す
   switchMode("A");
 }
