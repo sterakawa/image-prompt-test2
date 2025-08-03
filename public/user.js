@@ -61,7 +61,7 @@ function switchMode(mode) {
   document.getElementById("switchA").classList.toggle("active", mode === "A");
   document.getElementById("switchB").classList.toggle("active", mode === "B");
 
-  // 表示を切り替える
+  // 表示切替
   document.getElementById("resultBubbleA").style.display = (mode === "A") ? "inline-block" : "none";
   document.getElementById("resultBubbleB").style.display = (mode === "B") ? "inline-block" : "none";
 }
@@ -79,7 +79,7 @@ async function sendData() {
     return;
   }
 
-  // プロンプト未読み込み時はエラー
+  // プロンプト未読み込み時
   if (!personaPromptA && !personaPromptB) {
     alert("人格プロンプトが読み込まれていません。/prompts/ を確認してください。");
     return;
@@ -95,7 +95,7 @@ async function sendData() {
   // 送信用にリサイズ＆Base64化
   const base64Image = await resizeImage(imageInput.files[0], 512);
 
-  // APIリクエストデータ（常に両方送る）※ユーザー名も反映
+  // APIリクエストデータ（常に両方送る）
   const requestData = {
     promptA: combinedPromptA,
     promptB: combinedPromptB,
@@ -258,7 +258,7 @@ function triggerResetAnimation() {
 }
 
 // ===============================
-// UI初期化
+// UI初期化（写真・コメント・入力欄全て）
 // ===============================
 function resetUI() {
   document.getElementById("imageInput").value = "";
@@ -268,6 +268,10 @@ function resetUI() {
   document.querySelectorAll(".emotion-btn").forEach(b => b.classList.remove("selected"));
   selectedEmotion = "";
   currentMode = "A";
+
+  // コメントもリセット
+  document.querySelector("#resultBubbleA .comment").textContent = "";
+  document.querySelector("#resultBubbleB .comment").textContent = "";
 
   document.getElementById("resultBubbleA").classList.add("hidden");
   document.getElementById("resultBubbleB").classList.add("hidden");
