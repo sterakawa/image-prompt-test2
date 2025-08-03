@@ -274,9 +274,10 @@ function resetUI() {
   document.querySelector("#resultBubbleA .comment").textContent = "";
   document.querySelector("#resultBubbleB .comment").textContent = "";
 
-  // バブル完全非表示（switchModeは呼ばない）
+  // バブル完全非表示（inline-blockを強制解除）
   const bubbleA = document.getElementById("resultBubbleA");
   const bubbleB = document.getElementById("resultBubbleB");
+
   bubbleA.classList.add("hidden");
   bubbleB.classList.add("hidden");
   bubbleA.style.display = "none";
